@@ -3,7 +3,7 @@ CampQuest is a campsite search application where users can specify a number of c
 ## Meet The Team: Team Camping App
 ### [William Dalian](https://github.com/wildal99) - Team Lead
 I am in my second semester as a computer science masters student at Eastern Michigan University. I enjoy both the outdoors and building solutions with technology and look forward to working on this project which will combine both. My development background is in Python and Java and I've dabbled with C, C# and MySQL. 
-### [Ashley] ()
-### [Spenser Williams] ()
-### [Rob Hewison] ()
+### [2nd Team Member / Deputy Team Lead] ()
+### [3rd Team Member] ()
+### [4th Team member] ()
 ## Team Policies
