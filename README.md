@@ -25,4 +25,4 @@ Intentionally damaging or destroying work:
 - We will speak English at group meetings
 
 ### Masking Policy
-- Masking is not required for team members who are not ill, however team members may choose to wear a face mask if they choose to do so.
+- Masking is not required for team members who are not ill, however team members may wear a face mask if they choose to do so.
