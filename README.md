@@ -5,7 +5,7 @@ CampQuest is a campsite search application where users can specify a number of c
 ### [William Dalian](https://github.com/wildal99) - Team Lead
 I am in my second semester as a computer science masters student at Eastern Michigan University. I enjoy both the outdoors and building solutions with technology and look forward to working on this project which will combine both. My development background is in Python and Java and I've dabbled with C, C# and MySQL. 
 ### [2nd Team Member / Deputy Team Lead] ()
-### [Spenser Williams] ()
+### [Spenser Williams] (https://github.com/swill93)
 I am a senior in my last semester majoring in Data Science and Analytics. I usually enjoy stats and math, but I am excited to learn some new programming techniques in this project. My programming background is primarily in Java, Python, SQL, and R. 
 ## Team Policies
 ### Absence Policy
