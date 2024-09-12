@@ -8,6 +8,8 @@ I am in my second semester as a computer science masters student at Eastern Mich
 I am working through my last year as a Public Safety Administration and Data Science and Analytics double major, focusing on math, computer science, and network security courses. I specialize in data related skills with an interest in Python. In my spare time I enjoy campimg with my family and learning new skills, so I'm excited for the potential of this program. I'm excited to acquire and hone the skills involved with this project.
 ### [Spenser Williams](https://github.com/swill93)
 I am a senior in my last semester majoring in Data Science and Analytics. I usually enjoy stats and math, but I am excited to learn some new programming techniques in this project. My programming background is primarily in Java, Python, SQL, and R. 
+### [Evan Meyer](https://github.com/EvanMeyerEmich)
+Evan is the team leader of the OurSpace project, driven by a strong desire to see it come to life creatively. As a senior at Eastern Michigan University, he is set to graduate at the end of the Fall 2024 semester. Evan brings a wealth of experience in Java, Python, and HTML programming, along with a creative flair for music production, 3D modeling, and engineering. His diverse skill set and passion make him a pivotal force in the project’s success.
 ## Team Policies
 ### Absence Policy
 - If a team member cannot attend a class or meeting due to illness, or a family emergency they should alert the rest of the team as soon as they are able and communicate updates to the rest of the team. They will be given a summary of what was discussed at the team meeting, and what their and the teams next steps are.
