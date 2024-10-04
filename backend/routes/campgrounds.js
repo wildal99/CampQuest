@@ -1,5 +1,3 @@
-//Need to update route, fields ,"id" to be consistant across the web app
-
 const router = require('express').Router();
 let Campground = require('../models/campground.model');
 
@@ -12,24 +10,17 @@ router.route('/').get((req, res) =>{
 
 //POST a campground
 router.route('/add').post((req, res) => {
-    const{latitude, longitude, code, name, type, phone, dates_open, comments, num_sites, elevation, ammenities, state, nearest_town_distance, nearest_town_bearing, city} = req.body;
+    const{campgroundName, campgroundCode, longitude, latitude, phoneNumber, campgroundType, numSites, datesOpen} = req.body;
 
     const newCampground = new Campground({
-        latitude,
+        campgroundName,
+        campgroundCode,
         longitude,
-        code,
-        name,
-        type,
-        phone, 
-        dates_open,
-        comments,
-        num_sites,
-        elevation,
-        ammenities,
-        state,
-        nearest_town_distance,
-        nearest_town_bearing,
-        city
+        latitude,
+        phoneNumber,
+        campgroundType,
+        numSites,
+        datesOpen
     });
 
     newCampground.save()
@@ -54,22 +45,15 @@ router.route('/:id').get((req, res) => {
 // UPDATE a Campground
 router.route('/update/:id').post((req, res) => {
     Campground.findById(req.params.id)
-      .then(campground => {
-        campground.latitude = Number(req.body.latitude);
-        campground.longitude = Number(req.body.author);
-        campground.code = req.body.code;
-        campground.name = req.body.code;
-        campground.type = req.body.type;
-        campground.phone = req.body.phone;
-        campground.dates_open = req.body.dates_open;
-        campground.comments = req.body.comments;
-        campground.num_sites = Number(req.body.num_sites);
-        campground.elevation = Number(req.body.elevation);
-        campground.ammenities = req.body.ammenities;
-        campground.state = req.body.state;
-        campground.nearest_town_distance = Number(req.body.nearest_town_distance);
-        campground.nearest_town_bearing = Number(req.body.nearest_town_bearing);
-        campground.city = req.body.city;
+        .then(campground => {
+            campground.campgroundName = req.body.campgroundName;
+            campground.campgroundCode = req.body.code;
+            campground.longitude = Number(req.body.longitude);
+            campground.latitude = Number(req.body.latitude);
+            campground.phoneNumber = req.body.phoneNumber;
+            campground.campgroundType = req.body.campgroundType;
+            campground.numSites = Number(req.body.numSites);
+            campground.datesOpen = req.body.datesOpen;
   
         campground.save()
           .then(() => res.json('Book updated!'))
