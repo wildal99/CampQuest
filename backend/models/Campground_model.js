@@ -10,11 +10,11 @@ const campgroundSchema = new mongoose.Schema({
         requried: false
     },
     longitude: {
-        type: Decimal128,
+        type: Number,
         required: true
     },
     latitude: {
-        type: Decimal128,
+        type: Number,
         required: true
     },
     phoneNumber: {
@@ -26,7 +26,7 @@ const campgroundSchema = new mongoose.Schema({
         required: false
     },
     numSites: {
-        type: Int32,
+        type: Number,
         required: false
     },
     datesOpen: {
