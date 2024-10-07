@@ -17,17 +17,6 @@ const CampList = () => {
       })
   }, []);
 
-  // Delete a campground
-  const deleteCamp = (id) => {
-    axios.delete(`http://localhost:5000/camps/${id}`)
-      .then(response => {
-        console.log(response.data);
-        setCamp(camps.filter(el => el._id !== id));
-      })
-      .catch((error) => {
-        console.log('Error deleting campground:', error);
-      });
-  }
 
   return (
     <div className="camp-list">

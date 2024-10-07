@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
 import CampList from './components/CampList';
+import ViewCamp from './components/ViewCamp';
 function App() {
   return (
     <Router>
@@ -16,6 +17,7 @@ function App() {
         <br/>
         <Routes>
           <Route path="/" element={<CampList />} />
+          <Route path="/view/:id" element={<ViewCamp/>} />
         </Routes>
       </div>
     </Router>
