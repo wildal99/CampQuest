@@ -26,9 +26,7 @@ const CampList = () => {
           <div key={camp._id} className="camp-card">
             <div className="camp-info">
               <h2 className="camp-title">{camp.name}</h2>
-              <h4 className='camp-cord'>Latitude : {camp.latitude} Longitude: {camp.longitude}</h4>
               <h4 className='camp-cord'>City : {camp.city} State: {camp.state} Campground Type: {camp.type}</h4>
-              <h4 className='camp-contact'>Phone Number: {camp.phone}</h4>
               <div className="camp-actions">
                 <Link to={"/view/"+camp._id}>View</Link>
               </div>

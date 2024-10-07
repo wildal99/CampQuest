@@ -18,7 +18,7 @@ const CampView = () => {
   }, [id]);
 
   return (
-    <div className="camp-view">
+    <div className="camp-card">
       {camp ? (
         <div className="camp-details">
           <h1>{camp.name}</h1>
@@ -29,8 +29,8 @@ const CampView = () => {
           <p><strong>Phone:</strong> {camp.phone}</p>
           <p><strong>Number of Sites:</strong> {camp.numSites}</p>
           <p><strong>Dates Open:</strong> {camp.datesOpen || 'N/A'}</p>
+          <Link to={"/"}>Back</Link>
 
-          <Link to="/">Back to Camps</Link>
         </div>
       ) : (
         <p>Loading camp details...</p>

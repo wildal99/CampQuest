@@ -6,6 +6,11 @@
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  
+  background-image: url('./background.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .App-header {
@@ -24,7 +29,11 @@
   color: #61dafb;
   text-decoration: none;
 }
-
+.navbar-logo {
+  height: 300px; /* Set the desired height */
+  width: auto;  /* Maintain aspect ratio */
+  margin-right: 10px;
+}
 .App-link:hover {
   text-decoration: underline;
 }
@@ -34,6 +43,7 @@
   max-width: 900px;
   margin: 40px auto; /* Center the camp list on the page */
   text-align: left;
+  
 }
 
 .camp-card {
