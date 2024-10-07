@@ -8,7 +8,7 @@ function App() {
     <Router>
       <div className="App">
         <nav>
-          <Link to="/" className="navbar-brand"><img src={logo} className="navbar-logo"/></Link>
+          <Link to="/" className="navbar-brand"><img src={logo} className="navbar-logo" alt='CampQuest'/></Link>
           <div className="navbar-nav">
           </div>
         </nav>
