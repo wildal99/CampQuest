@@ -24,7 +24,8 @@ mongoose.connect(uri)
   .catch(err => console.log("MongoDB connection error:", err));
 
 // Define routes
-
+const campRouter = require('./routes/campgrounds');
+app.use('/camps', campRouter);
 
 // Start the server
 app.listen(port, () => {
