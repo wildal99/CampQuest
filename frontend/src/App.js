@@ -1,25 +1,24 @@
-import logo from './logo.svg';
+import logo from './logo2.svg';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
-
+import CampList from './components/CampList';
+import ViewCamp from './components/ViewCamp';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <nav>
+          <Link to="/" className="navbar-brand"><img src={logo} className="navbar-logo" alt='CampQuest'/></Link>
+          <div className="navbar-nav">
+          </div>
+        </nav>
+        <br/>
+        <Routes>
+          <Route path="/" element={<CampList />} />
+          <Route path="/view/:id" element={<ViewCamp/>} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
-
 export default App;

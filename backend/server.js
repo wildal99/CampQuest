@@ -22,9 +22,10 @@ const uri = process.env.MONGO_URI;
 mongoose.connect(uri)
   .then(() => console.log("MongoDB database connection established successfully"))
   .catch(err => console.log("MongoDB connection error:", err));
-
+mongoose
 // Define routes
-
+const campRouter = require('./routes/campgrounds');
+app.use('/camps', campRouter);
 
 // Start the server
 app.listen(port, () => {
