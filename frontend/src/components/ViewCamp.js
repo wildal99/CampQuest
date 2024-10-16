@@ -8,7 +8,7 @@ const CampView = () => {
   const [camp, setCamp] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/camps/${id}`)
+    axios.get(`http://34.237.102.85:5000/camps/${id}`)
       .then(response => {
         setCamp(response.data);
       })
@@ -18,7 +18,7 @@ const CampView = () => {
   }, [id]);
 
   return (
-    <div className="camp-card">
+    <div className="camp-container">
       {camp ? (
         <div className="camp-details">
           <h1>{camp.name}</h1>
@@ -30,13 +30,13 @@ const CampView = () => {
           <p><strong>Number of Sites:</strong> {camp.numSites}</p>
           <p><strong>Dates Open:</strong> {camp.datesOpen || 'N/A'}</p>
           <Link to={"/"}>Back</Link>
-
         </div>
       ) : (
         <p>Loading camp details...</p>
       )}
     </div>
   );
+  
 }
 
 export default CampView;

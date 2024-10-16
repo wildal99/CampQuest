@@ -10,13 +10,13 @@ const CampList = () => {
 
   // Fetch campgrounds from backend
   useEffect(() => {
-    axios.get('http://localhost:5000/camps/')
+    axios.get('http://34.237.102.85:5000/camps/')
       .then(response => {
         setCamp(response.data);
       })
       .catch((error) => {
         console.log('Error fetching campgrounds:', error);
-      })
+      });
   }, []);
 
   // Get current camps
@@ -46,7 +46,7 @@ const CampList = () => {
             <div key={camp._id} className="camp-card">
               <div className="camp-info">
                 <h2 className="camp-title">{camp.name}</h2>
-                <h4 className='camp-cord'>City: {camp.city} State: {camp.state} Campground Type: {camp.type}</h4>
+                <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {camp.type}</h4>
                 <div className="camp-actions">
                   <Link to={"/view/" + camp._id}>View</Link>
                 </div>
@@ -58,7 +58,7 @@ const CampList = () => {
         )}
       </div>
 
-      {/* Pagination with < > controls */}
+      {/* Pagination */}
       <div className="pagination">
         <button onClick={prevPage} disabled={currentPage === 1}>&lt;</button>
         <span> Page {currentPage} of {Math.ceil(camps.length / campsPerPage)} </span>
