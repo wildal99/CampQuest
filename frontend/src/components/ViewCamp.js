@@ -8,7 +8,7 @@ const CampView = () => {
   const [camp, setCamp] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://34.237.102.85:5000/camps/${id}`)
+    axios.get(`http://localhost:5000/camps/${id}`)
       .then(response => {
         setCamp(response.data);
       })

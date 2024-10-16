@@ -6,11 +6,12 @@ import '../App.css';
 const CampList = () => {
   const [camps, setCamp] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");  // New state for search
   const campsPerPage = 20;
 
   // Fetch campgrounds from backend
   useEffect(() => {
-    axios.get('http://34.237.102.85:5000/camps/')
+    axios.get('http://localhost:5000/camps/')
       .then(response => {
         setCamp(response.data);
       })
@@ -19,14 +20,19 @@ const CampList = () => {
       });
   }, []);
 
-  // Get current camps
+  // Filter camps based on search term
+  const filteredCamps = camps.filter(camp =>
+    camp.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination logic
   const indexOfLastCamp = currentPage * campsPerPage;
   const indexOfFirstCamp = indexOfLastCamp - campsPerPage;
-  const currentCamps = camps.slice(indexOfFirstCamp, indexOfLastCamp);
+  const currentCamps = filteredCamps.slice(indexOfFirstCamp, indexOfLastCamp);
 
   // Change page
   const nextPage = () => {
-    if (currentPage < Math.ceil(camps.length / campsPerPage)) {
+    if (currentPage < Math.ceil(filteredCamps.length / campsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -40,6 +46,15 @@ const CampList = () => {
   return (
     <div className="camp-list">
       <h1>Camps</h1>
+
+      {/* Search input */}
+      <input
+        type="text"
+        placeholder="Search camps by name..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+      />
+      
       <div className="camp-cards-container">
         {currentCamps.length > 0 ? (
           currentCamps.map(camp => (
@@ -61,8 +76,8 @@ const CampList = () => {
       {/* Pagination */}
       <div className="pagination">
         <button onClick={prevPage} disabled={currentPage === 1}>&lt;</button>
-        <span> Page {currentPage} of {Math.ceil(camps.length / campsPerPage)} </span>
-        <button onClick={nextPage} disabled={currentPage === Math.ceil(camps.length / campsPerPage)}>&gt;</button>
+        <span> Page {currentPage} of {Math.ceil(filteredCamps.length / campsPerPage)} </span>
+        <button onClick={nextPage} disabled={currentPage === Math.ceil(filteredCamps.length / campsPerPage)}>&gt;</button>
       </div>
     </div>
   );
