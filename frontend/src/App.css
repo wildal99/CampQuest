@@ -60,16 +60,25 @@
   }
 }
 
+.camp-list{
+  display: grid;
+  justify-content: center;
+  padding-left: 2pc;
+  padding-right: 2pc;
+}
+
 input.searchText{
   margin-top: 0.5pc;
   margin-bottom: 1.5pc;
 }
+
 .camp-cards-container {
   display: flex;
   flex-wrap: wrap;
   gap: 2pc;
   justify-content: center;
- 
+  max-width: 1500px;
+  
 }
 
 .camp-card {
