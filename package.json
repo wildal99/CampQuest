@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/COSC481W-2024Fall/CampQuest#readme",
   "dependencies": {
+
     "chromedriver": "^130.0.1",
     "selenium-webdriver": "^4.25.0"
   }
