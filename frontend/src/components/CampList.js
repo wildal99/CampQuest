@@ -22,7 +22,7 @@ const CampList = () => {
 
   // Filter camps based on search term
   const filteredCamps = camps.filter(camp =>
-    camp.name.toLowerCase().includes(searchTerm.toLowerCase())
+    camp.campgroundName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
