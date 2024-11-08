@@ -145,3 +145,25 @@ input.searchText{
   margin: 0 10px;
   font-size: 1.2em;
 }
+.loading-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loading-bar {
+  width: 100%;
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  height: 20px;
+  margin-top: 10px;
+}
+
+.loading-progress {
+  height: 100%;
+  background-color: #4caf50;
+  text-align: center;
+  color: white;
+  line-height: 20px;
+  transition: width 0.3s;
+}

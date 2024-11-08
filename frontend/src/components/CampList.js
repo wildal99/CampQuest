@@ -8,12 +8,18 @@ const CampList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");  // New state for search
   const [loading, setLoading] = useState(true);      // New state for loading
+  const [progress, setProgress] = useState(0);       // New state for progress
   const campsPerPage = 12;
 
   // Fetch campgrounds from backend
   useEffect(() => {
     setLoading(true); // Start loading
-    axios.get('https://campquest-1.onrender.com/camps/')
+    setProgress(0);   // Reset progress
+    const interval = setInterval(() => {
+      setProgress((prev) => (prev < 90 ? prev + 10 : prev)); // Simulate progress incrementally
+    }, 300); // Update progress every 300ms
+
+    axios.get(`${process.env.REACT_APP_API_URL}/camps}`)
       .then(response => {
         setCamp(response.data);
         setLoading(false); // Stop loading after data is fetched
@@ -21,7 +27,13 @@ const CampList = () => {
       .catch((error) => {
         console.log('Error fetching campgrounds:', error);
         setLoading(false); // Stop loading if there's an error
+      })
+      .finally(() => {
+        clearInterval(interval); // Clear interval once loading is done
+        setProgress(100); // Complete progress to 100%
       });
+
+    return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
 
   // Filter camps based on search term
@@ -57,9 +69,16 @@ const CampList = () => {
         onChange={e => setSearchTerm(e.target.value)}
       />
       
-      {/* Loading Indicator */}
+      {/* Loading Bar */}
       {loading ? (
-        <p>Loading camps...</p>
+        <div className="loading-container">
+          <p>Loading camps...</p>
+          <div className="loading-bar">
+            <div className="loading-progress" style={{ width: `${progress}%` }}>
+              {progress}%
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="camp-cards-container">
           {currentCamps.length > 0 ? (
