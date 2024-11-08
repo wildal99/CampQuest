@@ -11,7 +11,7 @@ const CampList = () => {
 
   // Fetch campgrounds from backend
   useEffect(() => {
-    axios.get('http://localhost:5000/camps/')
+    axios.get('https://campquest-1.onrender.com/camps/')
       .then(response => {
         setCamp(response.data);
       })
