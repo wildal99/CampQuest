@@ -17,6 +17,38 @@ const CampView = () => {
         console.log('Error fetching campground details:', error);
       });
   }, [id]);
+  // Mapping for amenities and types
+  const amenitiesMap = {
+    E: 'Electricity',
+    DP: 'Dump Station',
+    DW: 'Drinking Water',
+    SH: 'Showers',
+    RS: 'Restrooms',
+    PA: 'Picnic Area',
+    PT: 'Pit Toilet',
+    NH: 'No Hookups',
+    L$: 'Laundry (Paid)'
+  };
+
+  const campgroundTypeMap = {
+    CP: 'County Park',
+    COE: 'Corps of Engineers',
+    NP: 'National Park',
+    NF: 'National Forest',
+    SP: 'State Park',
+    PP: 'Provincial Park',
+    RV: 'RV Park',
+    BML: 'Bureau of Land Management'
+  };
+
+  // Decode amenities
+  const decodedAmenities = camp?.amenities
+    ?.split(' ')
+    .map(code => amenitiesMap[code] || code)
+    .join(', ');
+
+  // Decode campground type
+  const decodedType = campgroundTypeMap[camp?.campgroundType] || camp?.campgroundType;
 
   return (
     <div className="view-camp-container">
@@ -34,7 +66,8 @@ const CampView = () => {
           <p><strong>Location:</strong> {camp.latitude}, {camp.longitude}</p>
           <p><strong>City:</strong> {camp.city}</p>
           <p><strong>State:</strong> {camp.state}</p>
-          <p><strong>Campground Type:</strong> {camp.campgroundType}</p>
+          <p><strong>Campground Type:</strong> {decodedType}</p>
+          <p><strong>Amenities:</strong> {decodedAmenities || 'N/A'}</p>
           <p><strong>Phone:</strong> {camp.phoneNumber}</p>
           <p><strong>Number of Sites:</strong> {camp.numSites}</p>
           <p><strong>Dates Open:</strong> {camp.datesOpen || 'N/A'}</p>

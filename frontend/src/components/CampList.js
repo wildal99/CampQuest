@@ -9,7 +9,17 @@ const CampList = () => {
   const [searchTerm, setSearchTerm] = useState("");  // New state for search
   const [loading, setLoading] = useState(true);      // New state for loading
   const campsPerPage = 12;
-
+  const campgroundTypeMap = {
+    CP: 'County Park',
+    COE: 'Corps of Engineers',
+    NP: 'National Park',
+    NF: 'National Forest',
+    SP: 'State Park',
+    PP: 'Provincial Park',
+    RV: 'RV Park',
+    BML: 'Bureau of Land Management'
+  };
+  const decodedType = campgroundTypeMap[camp?.campgroundType] || camp?.campgroundType;
   // Fetch campgrounds from backend
   useEffect(() => {
     setLoading(true); // Start loading
@@ -68,7 +78,7 @@ const CampList = () => {
                 <div className="camp-card">
                   <div className="camp-info">
                     <h2 className="camp-title">{camp.campgroundName}</h2>
-                    <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {camp.campgroundType}</h4>
+                    <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {decodedType}</h4>
                     <div className="camp-actions">
                       View
                     </div>
