@@ -18,14 +18,16 @@ const CampList = () => {
     const interval = setInterval(() => {
       setProgress((prev) => (prev < 90 ? prev + 10 : prev)); // Simulate progress incrementally
     }, 300); // Update progress every 300ms
+  
 
     axios.get(`${process.env.REACT_APP_API_URL}/camps}`)
       .then(response => {
-        setCamp(response.data);
+        setCamp(Array.isArray(response.data) ? response.data : []); // Ensure `camps` is an array
         setLoading(false); // Stop loading after data is fetched
       })
       .catch((error) => {
         console.log('Error fetching campgrounds:', error);
+        setCamp([]); // Set `camps` to an empty array if there’s an error
         setLoading(false); // Stop loading if there's an error
       })
       .finally(() => {
