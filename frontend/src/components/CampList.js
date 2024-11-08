@@ -7,16 +7,20 @@ const CampList = () => {
   const [camps, setCamp] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");  // New state for search
+  const [loading, setLoading] = useState(true);      // New state for loading
   const campsPerPage = 12;
 
   // Fetch campgrounds from backend
   useEffect(() => {
-    axios.get('${process.env.REACT_APP_API_URL}/camps/')
+    setLoading(true); // Start loading
+    axios.get('https://campquest-1.onrender.com/camps/')
       .then(response => {
         setCamp(response.data);
+        setLoading(false); // Stop loading after data is fetched
       })
       .catch((error) => {
         console.log('Error fetching campgrounds:', error);
+        setLoading(false); // Stop loading if there's an error
       });
   }, []);
 
@@ -45,7 +49,6 @@ const CampList = () => {
 
   return (
     <div className="camp-list">
-
       {/* Search input */}
       <input className="searchText"
         type="text"
@@ -54,25 +57,30 @@ const CampList = () => {
         onChange={e => setSearchTerm(e.target.value)}
       />
       
-      <div className="camp-cards-container">
-        {currentCamps.length > 0 ? (
-          currentCamps.map(camp => (
-            <Link to = {"/view/" + camp._id} >
-            <div key={camp._id} className="camp-card">
-              <div className="camp-info">
-                <h2 className="camp-title">{camp.campgroundName}</h2>
-                <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {camp.campgroundType}</h4>
-                <div className="camp-actions">
-                  View
+      {/* Loading Indicator */}
+      {loading ? (
+        <p>Loading camps...</p>
+      ) : (
+        <div className="camp-cards-container">
+          {currentCamps.length > 0 ? (
+            currentCamps.map(camp => (
+              <Link to={"/view/" + camp._id} key={camp._id}>
+                <div className="camp-card">
+                  <div className="camp-info">
+                    <h2 className="camp-title">{camp.campgroundName}</h2>
+                    <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {camp.campgroundType}</h4>
+                    <div className="camp-actions">
+                      View
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            </Link>
-          ))
-        ) : (
-          <p>No camps available</p>
-        )}
-      </div>
+              </Link>
+            ))
+          ) : (
+            <p>No camps available</p>
+          )}
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="pagination">
@@ -82,6 +90,6 @@ const CampList = () => {
       </div>
     </div>
   );
-}
+};
 
 export default CampList;
