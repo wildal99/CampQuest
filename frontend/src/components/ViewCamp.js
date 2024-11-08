@@ -9,7 +9,7 @@ const CampView = () => {
   const [camp, setCamp] = useState(null);
 
   useEffect(() => {
-    axios.get(`https://campquest-1.onrender.com/camps/${id}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/camps/${id}`)
       .then(response => {
         setCamp(response.data);
       })

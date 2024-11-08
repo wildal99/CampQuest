@@ -11,7 +11,7 @@ const CampList = () => {
 
   // Fetch campgrounds from backend
   useEffect(() => {
-    axios.get('https://campquest-1.onrender.com/camps/')
+    axios.get('${process.env.REACT_APP_API_URL}/camps/')
       .then(response => {
         setCamp(response.data);
       })
