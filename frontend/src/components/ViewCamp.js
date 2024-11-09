@@ -24,10 +24,14 @@ const CampView = () => {
     DW: 'Drinking Water',
     SH: 'Showers',
     RS: 'Restrooms',
-    PA: 'Picnic Area',
+    PA: 'Pets Aloowed',
+    NP: 'No Pets',
     PT: 'Pit Toilet',
     NH: 'No Hookups',
-    L$: 'Laundry (Paid)'
+    L$: 'Free or under $12',
+    ND: 'No Dump Station',
+    WE: 'Water Electricity',
+    WES: 'Water Electricity Sewer'
   };
 
   const campgroundTypeMap = {
