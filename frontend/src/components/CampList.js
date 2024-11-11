@@ -7,8 +7,7 @@ const CampList = () => {
   const [camps, setCamp] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [totalCamps, setTotalCamps] = useState(0); // Track total camps for pagination
+  const [loading, setLoading] = useState(true);
   const campsPerPage = 12;
 
   const campgroundTypeMap = {
@@ -22,31 +21,29 @@ const CampList = () => {
     BML: 'Bureau of Land Management'
   };
 
-  const fetchCamps = async (page = 1) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps`, {
-        params: {
-          page,
-          limit: campsPerPage,
-          search: searchTerm
-        }
-      });
-      setCamp(response.data.camps); // Update to hold only current page's camps
-      setTotalCamps(response.data.totalCamps); // Assuming backend sends total number of camps
-      setLoading(false);
-    } catch (error) {
-      console.log('Error fetching campgrounds:', error);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchCamps(currentPage);
-  }, [currentPage, searchTerm]);
+    setLoading(true);
+    axios.get(`${process.env.REACT_APP_API_URL}/camps`)
+      .then(response => {
+        setCamp(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log('Error fetching campgrounds:', error);
+        setLoading(false);
+      });
+  }, []);
+
+  const filteredCamps = camps.filter(camp =>
+    camp.campgroundName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastCamp = currentPage * campsPerPage;
+  const indexOfFirstCamp = indexOfLastCamp - campsPerPage;
+  const currentCamps = filteredCamps.slice(indexOfFirstCamp, indexOfLastCamp);
 
   const nextPage = () => {
-    if (currentPage < Math.ceil(totalCamps / campsPerPage)) {
+    if (currentPage < Math.ceil(filteredCamps.length / campsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -70,8 +67,8 @@ const CampList = () => {
         <p>Loading camps...</p>
       ) : (
         <div className="camp-cards-container">
-          {camps.length > 0 ? (
-            camps.map(camp => {
+          {currentCamps.length > 0 ? (
+            currentCamps.map(camp => {
               const decodedType = campgroundTypeMap[camp.campgroundType] || camp.campgroundType;
               return (
                 <Link to={"/view/" + camp._id} key={camp._id}>
@@ -95,8 +92,8 @@ const CampList = () => {
 
       <div className="pagination">
         <button onClick={prevPage} disabled={currentPage === 1}>&lt;</button>
-        <span> Page {currentPage} of {Math.ceil(totalCamps / campsPerPage)} </span>
-        <button onClick={nextPage} disabled={currentPage === Math.ceil(totalCamps / campsPerPage)}>&gt;</button>
+        <span> Page {currentPage} of {Math.ceil(filteredCamps.length / campsPerPage)} </span>
+        <button onClick={nextPage} disabled={currentPage === Math.ceil(filteredCamps.length / campsPerPage)}>&gt;</button>
       </div>
     </div>
   );
