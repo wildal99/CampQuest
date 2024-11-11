@@ -70,7 +70,7 @@ const CampView = () => {
           {/* Section for Map and Camp Details */}
           <div className="map-camp-section">
             <div className="map-container">
-              <LoadScript googleMapsApiKey={'AIzaSyAreFnovUx3AjW0suma9Fv-35wmknZBSCw'}>
+              <LoadScript googleMapsApiKey={REACT_APP_GOOGLE_MAPS_API_KEY}>
                 <GoogleMap
                   mapContainerStyle={mapContainerStyle}
                   center={center}
