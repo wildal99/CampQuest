@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useParams, Link } from 'react-router-dom';
 import '../App.css';
 import '../DetailsPage.css';
