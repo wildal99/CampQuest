@@ -2,11 +2,26 @@
     let Campground = require('../models/campground_model');
 
     //GET all campgrounds
-    router.route('/').get((req, res) =>{ 
-        Campground.find()
-            .then(campgrounds => res.json(campgrounds))
-            .catch(err => res.status(400).json('Error: ' + err));
-    })
+    // GET paginated campgrounds
+    router.route('/').get(async (req, res) => {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 12;  // Default to 12 items per page
+
+            const campgrounds = await Campground.find()
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const totalCampgrounds = await Campground.countDocuments();
+            res.json({
+                campgrounds,
+                totalPages: Math.ceil(totalCampgrounds / limit),
+                currentPage: page
+            });
+        } catch (err) {
+            res.status(400).json('Error: ' + err);
+        }
+    });
 
     //POST a campground
     router.route('/add').post((req, res) => {
