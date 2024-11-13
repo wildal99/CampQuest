@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
 
 const CampList = () => {
-  const location = useLocation();
-  const history = useHistory();
-
-  // Initialize from URL parameters if available
-  const queryParams = new URLSearchParams(location.search);
-  const initialSearchTerm = queryParams.get("search") || "";
-  const initialPage = parseInt(queryParams.get("page")) || 1;
-
-  const [camps, setCamp] = useState([]);
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [camps, setCamp] = useState([]); // Initialize as an array
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const campsPerPage = 12;
 
@@ -30,52 +22,50 @@ const CampList = () => {
     BML: 'Bureau of Land Management'
   };
 
-  const fetchCamps = async (page = 1, search = "") => {
+  const fetchCamps = async (page = 1) => {
     setLoading(true);
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps/search`, {
         params: {
-          q: search,
+          q: searchTerm,
           page,
           limit: campsPerPage
         }
       });
 
-      console.log('API response:', response.data);
+      console.log('API response:', response.data); // Debugging line
 
       const campgrounds = Array.isArray(response.data.campgrounds) ? response.data.campgrounds : [];
       setCamp(campgrounds);
       setTotalPages(response.data.totalPages || 1);
       setCurrentPage(page);
       setLoading(false);
-
-      // Update URL parameters
-      history.push(`?search=${search}&page=${page}`);
     } catch (error) {
       console.log('Error fetching campgrounds:', error);
-      setCamp([]);
+      setCamp([]); // Ensure camps is an empty array on error
       setLoading(false);
     }
   };
 
+  // Fetch camps on initial load
   useEffect(() => {
-    fetchCamps(initialPage, initialSearchTerm);
-  }, [initialPage, initialSearchTerm]);
+    fetchCamps();
+  }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    fetchCamps(1, searchTerm); // Reset to first page on new search
+    fetchCamps(1); // Reset to first page on new search
   };
 
   const nextPage = () => {
     if (currentPage < totalPages) {
-      fetchCamps(currentPage + 1, searchTerm);
+      fetchCamps(currentPage + 1);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 1) {
-      fetchCamps(currentPage - 1, searchTerm);
+      fetchCamps(currentPage - 1);
     }
   };
 
