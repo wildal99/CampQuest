@@ -22,7 +22,31 @@
             res.status(400).json('Error: ' + err);
         }
     });
+    // SEARCH campgrounds by name
+    router.route('/search').get(async (req, res) => {
+        try {
+            const searchTerm = req.query.q || '';
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 12;
 
+            const query = searchTerm
+                ? { campgroundName: { $regex: searchTerm, $options: 'i' } }
+                : {};
+
+            const campgrounds = await Campground.find(query)
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            const totalResults = await Campground.countDocuments(query);
+            res.json({
+                campgrounds,
+                totalPages: Math.ceil(totalResults / limit),
+                currentPage: page
+            });
+        } catch (err) {
+            res.status(400).json('Error: ' + err);
+        }
+    });
     //POST a campground
     router.route('/add').post((req, res) => {
         const{campgroundName, campgroundCode, longitude, latitude, phoneNumber, campgroundType, numSites, datesOpen} = req.body;

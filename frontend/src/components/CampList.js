@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
 
 const CampList = () => {
-  const [camps, setCamp] = useState([]); // Initialize as an array
-  const [currentPage, setCurrentPage] = useState(1);
+  const location = useLocation();
+  const history = useHistory();
+
+  // Initialize from URL parameters if available
+  const queryParams = new URLSearchParams(location.search);
+  const initialSearchTerm = queryParams.get("search") || "";
+  const initialPage = parseInt(queryParams.get("page")) || 1;
+
+  const [camps, setCamp] = useState([]);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [loading, setLoading] = useState(true);
   const campsPerPage = 12;
 
@@ -22,65 +30,74 @@ const CampList = () => {
     BML: 'Bureau of Land Management'
   };
 
+  const fetchCamps = async (page = 1, search = "") => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps/search`, {
+        params: {
+          q: search,
+          page,
+          limit: campsPerPage
+        }
+      });
+
+      console.log('API response:', response.data);
+
+      const campgrounds = Array.isArray(response.data.campgrounds) ? response.data.campgrounds : [];
+      setCamp(campgrounds);
+      setTotalPages(response.data.totalPages || 1);
+      setCurrentPage(page);
+      setLoading(false);
+
+      // Update URL parameters
+      history.push(`?search=${search}&page=${page}`);
+    } catch (error) {
+      console.log('Error fetching campgrounds:', error);
+      setCamp([]);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCamps = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps`, {
-          params: {
-            page: currentPage,
-            limit: campsPerPage
-          }
-        });
+    fetchCamps(initialPage, initialSearchTerm);
+  }, [initialPage, initialSearchTerm]);
 
-        console.log('API response:', response.data); // Debugging line
-
-        // Ensure that camps is always an array
-        const campgrounds = Array.isArray(response.data.campgrounds) ? response.data.campgrounds : [];
-        setCamp(campgrounds);
-        setTotalPages(response.data.totalPages || 1);
-        setLoading(false);
-      } catch (error) {
-        console.log('Error fetching campgrounds:', error);
-        setCamp([]); // Ensure camps is an empty array on error
-        setLoading(false);
-      }
-    };
-    fetchCamps();
-  }, [currentPage]);
-
-  const filteredCamps = Array.isArray(camps) ? camps.filter(camp =>
-    camp.campgroundName.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    fetchCamps(1, searchTerm); // Reset to first page on new search
+  };
 
   const nextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      fetchCamps(currentPage + 1, searchTerm);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      fetchCamps(currentPage - 1, searchTerm);
     }
   };
 
   return (
     <div className="camp-list">
-      <input
-        className="searchText"
-        type="text"
-        placeholder="Search camps by name..."
-        value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
-      />
+      <form onSubmit={handleSearchSubmit}>
+        <input
+          className="searchText"
+          type="text"
+          placeholder="Search camps by name..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+        <button type="submit">Search</button>
+      </form>
 
       {loading ? (
         <p>Loading camps...</p>
       ) : (
         <div className="camp-cards-container">
-          {filteredCamps.length > 0 ? (
-            filteredCamps.map(camp => {
+          {camps.length > 0 ? (
+            camps.map(camp => {
               const decodedType = campgroundTypeMap[camp.campgroundType] || camp.campgroundType;
               return (
                 <Link to={"/view/" + camp._id} key={camp._id}>
