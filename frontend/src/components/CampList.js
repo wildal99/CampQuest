@@ -4,8 +4,9 @@ import axios from 'axios';
 import '../App.css';
 
 const CampList = () => {
-  const [camps, setCamp] = useState([]);
+  const [camps, setCamp] = useState([]); // Initialize as an array
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const campsPerPage = 12;
@@ -22,28 +23,38 @@ const CampList = () => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    axios.get(`${process.env.REACT_APP_API_URL}/camps`)
-      .then(response => {
-        setCamp(response.data);
+    const fetchCamps = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps`, {
+          params: {
+            page: currentPage,
+            limit: campsPerPage
+          }
+        });
+
+        console.log('API response:', response.data); // Debugging line
+
+        // Ensure that camps is always an array
+        const campgrounds = Array.isArray(response.data.campgrounds) ? response.data.campgrounds : [];
+        setCamp(campgrounds);
+        setTotalPages(response.data.totalPages || 1);
         setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.log('Error fetching campgrounds:', error);
+        setCamp([]); // Ensure camps is an empty array on error
         setLoading(false);
-      });
-  }, []);
+      }
+    };
+    fetchCamps();
+  }, [currentPage]);
 
-  const filteredCamps = camps.filter(camp =>
+  const filteredCamps = Array.isArray(camps) ? camps.filter(camp =>
     camp.campgroundName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const indexOfLastCamp = currentPage * campsPerPage;
-  const indexOfFirstCamp = indexOfLastCamp - campsPerPage;
-  const currentCamps = filteredCamps.slice(indexOfFirstCamp, indexOfLastCamp);
+  ) : [];
 
   const nextPage = () => {
-    if (currentPage < Math.ceil(filteredCamps.length / campsPerPage)) {
+    if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -56,19 +67,20 @@ const CampList = () => {
 
   return (
     <div className="camp-list">
-      <input className="searchText"
+      <input
+        className="searchText"
         type="text"
         placeholder="Search camps by name..."
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      
+
       {loading ? (
         <p>Loading camps...</p>
       ) : (
         <div className="camp-cards-container">
-          {currentCamps.length > 0 ? (
-            currentCamps.map(camp => {
+          {filteredCamps.length > 0 ? (
+            filteredCamps.map(camp => {
               const decodedType = campgroundTypeMap[camp.campgroundType] || camp.campgroundType;
               return (
                 <Link to={"/view/" + camp._id} key={camp._id}>
@@ -76,9 +88,7 @@ const CampList = () => {
                     <div className="camp-info">
                       <h2 className="camp-title">{camp.campgroundName}</h2>
                       <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {decodedType}</h4>
-                      <div className="camp-actions">
-                        View
-                      </div>
+                      <div className="camp-actions">View</div>
                     </div>
                   </div>
                 </Link>
@@ -92,8 +102,8 @@ const CampList = () => {
 
       <div className="pagination">
         <button onClick={prevPage} disabled={currentPage === 1}>&lt;</button>
-        <span> Page {currentPage} of {Math.ceil(filteredCamps.length / campsPerPage)} </span>
-        <button onClick={nextPage} disabled={currentPage === Math.ceil(filteredCamps.length / campsPerPage)}>&gt;</button>
+        <span> Page {currentPage} of {totalPages} </span>
+        <button onClick={nextPage} disabled={currentPage === totalPages}>&gt;</button>
       </div>
     </div>
   );
