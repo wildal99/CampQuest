@@ -1,15 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { useParams, Link } from 'react-router-dom';
 import '../App.css';
+import '../DetailsPage.css';
 
-const CampList = () => {
-  const [camps, setCamp] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const campsPerPage = 12;
+const CampView = () => {
+  const { id } = useParams(); // Get the campground ID from the URL
+  const [camp, setCamp] = useState(null);
+
+  useEffect(() => {
+    axios.get(`${process.env.REACT_APP_API_URL}/camps/${id}`)
+      .then(response => {
+        setCamp(response.data);
+      })
+      .catch((error) => {
+        console.log('Error fetching campground details:', error);
+      });
+  }, [id]);
+  // Mapping for amenities and types
+  const amenitiesMap = {
+    E: 'Electricity',
+    DP: 'Dump Station',
+    DW: 'Drinking Water',
+    SH: 'Showers',
+    RS: 'Restrooms',
+    PA: 'Pets Aloowed',
+    NP: 'No Pets',
+    PT: 'Pit Toilet',
+    NH: 'No Hookups',
+    L$: 'Free or under $12',
+    ND: 'No Dump Station',
+    WE: 'Water Electricity',
+    WES: 'Water Electricity Sewer'
+  };
 
   const campgroundTypeMap = {
     CP: 'County Park',
@@ -22,85 +46,78 @@ const CampList = () => {
     BML: 'Bureau of Land Management'
   };
 
-  useEffect(() => {
-    const fetchCamps = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps`, {
-          params: {
-            page: currentPage,
-            limit: campsPerPage
-          }
-        });
-        setCamp(response.data.campgrounds);
-        setTotalPages(response.data.totalPages);
-        setLoading(false);
-      } catch (error) {
-        console.log('Error fetching campgrounds:', error);
-        setLoading(false);
-      }
-    };
-    fetchCamps();
-  }, [currentPage]);
+  // Decode amenities
+  const decodedAmenities = camp?.amenities
+    ?.split(' ')
+    .map(code => amenitiesMap[code] || code)
+    .join(', ');
 
-  const filteredCamps = camps.filter(camp =>
-    camp.campgroundName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const nextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  // Decode campground type
+  const decodedType = campgroundTypeMap[camp?.campgroundType] || camp?.campgroundType;
+  const mapContainerStyle = {
+    width: '100%',
+    height: '300px',
   };
 
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const center = camp ? {
+    lat: parseFloat(camp.latitude),
+    lng: parseFloat(camp.longitude)
+  } : { lat: 0, lng: 0 }; // Fallback center
 
   return (
-    <div className="camp-list">
-      <input
-        className="searchText"
-        type="text"
-        placeholder="Search camps by name..."
-        value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
-      />
+    <div className="view-camp-container">
+      {camp ? (
+        <>
+          {/* Section for Map and Camp Details */}
+          <div className="map-camp-section">
+            <div className="map-container">
+              <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
+                <GoogleMap
+                  mapContainerStyle={mapContainerStyle}
+                  center={center}
+                  zoom={10}
+                >
+                  <Marker position={center} />
+                </GoogleMap>
+              </LoadScript>
+            </div>
 
-      {loading ? (
-        <p>Loading camps...</p>
+            <div className="camp-details">
+              <h1>{camp.campgroundName}</h1>
+              <p><strong>Location:</strong> {camp.latitude}, {camp.longitude}</p>
+              <p><strong>City:</strong> {camp.city}</p>
+              <p><strong>State:</strong> {camp.state}</p>
+              <p><strong>Campground Type:</strong> {camp.campgroundType}</p>
+              <p><strong>Phone:</strong> {camp.phoneNumber}</p>
+              <p><strong>Number of Sites:</strong> {camp.numSites}</p>
+              <p><strong>Dates Open:</strong> {camp.datesOpen || 'N/A'}</p>
+              <Link to={"/"}>Back</Link>
+            </div>
+          </div>
+
+          {/* Review Section */}
+          <div className="review-section">
+            <h2>Leave a Review</h2>
+            <textarea placeholder="Leave a review..." />
+            <button>Submit</button>
+          </div>
+
+          {/* Similar Campgrounds */}
+          <div className="similar-campgrounds">
+            <h2>Similar Campgrounds</h2>
+            <div className="campgrounds">
+              <div className="camping-card">Campground 1</div>
+              <div className="camping-card">Campground 2</div>
+              <div className="camping-card">Campground 3</div>
+              <div className="camping-card">Campground 4</div>
+            </div>
+          </div>
+        </>
       ) : (
-        <div className="camp-cards-container">
-          {filteredCamps.length > 0 ? (
-            filteredCamps.map(camp => {
-              const decodedType = campgroundTypeMap[camp.campgroundType] || camp.campgroundType;
-              return (
-                <Link to={"/view/" + camp._id} key={camp._id}>
-                  <div className="camp-card">
-                    <div className="camp-info">
-                      <h2 className="camp-title">{camp.campgroundName}</h2>
-                      <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {decodedType}</h4>
-                      <div className="camp-actions">View</div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })
-          ) : (
-            <p>No camps available</p>
-          )}
-        </div>
+        <p>Loading camp details...</p>
       )}
-
-      <div className="pagination">
-        <button onClick={prevPage} disabled={currentPage === 1}>&lt;</button>
-        <span> Page {currentPage} of {totalPages} </span>
-        <button onClick={nextPage} disabled={currentPage === totalPages}>&gt;</button>
-      </div>
     </div>
   );
 };
 
-export default CampList;
+export default CampView;
