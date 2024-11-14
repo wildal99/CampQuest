@@ -4,7 +4,9 @@ const campgroundSchema = new mongoose.Schema({
     _id:{
         type: String,
     },
-
+    amenities:{
+        Type: String,
+    },
     campgroundName: {
         type: String,
         required: true

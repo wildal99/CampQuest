@@ -12,6 +12,7 @@ const CampView = () => {
   const [similar, setSimilar] = useState([]);
   const [campsList, setCampList] = useState([]);
 
+  //load camp from the database
   useEffect(() => {
     axios.get(`http://localhost:5000/camps/${id}`)
       .then(response => {
@@ -22,6 +23,7 @@ const CampView = () => {
       });
   }, [id]);
 
+  //load campgrounds from the database
   useEffect(() => {
     axios.get('http://localhost:5000/camps/')
       .then(response => {
@@ -30,16 +32,12 @@ const CampView = () => {
       .catch((error) => {
         console.log('Error fetching similar campgrounds:', error);
       });
-      
   }, []);  
 
-console.log("raw list",campsList);
-
+//find similarity of all campsites
 let similarCamps = findSimilar(camp, campsList);
-console.log("similarly sorted list",similarCamps);
 
-
-
+//return html for the page
 return(
     <div className="view-camp-container">
       {/* wait until camp details are loaded to display the camp */}
@@ -116,14 +114,42 @@ function findSimilar(self, others){
   let campSimilarity =  others.map( othr=> {
     //find distance between two camps
     let distance = computeDistance(self.latitude, self.longitude, othr.latitude, othr.longitude);
+    let ammenityScore = computeAmmenities(self, othr)
+    let similarScore = distance + ammenityScore*7.5
     return {_id: othr._id, campgroundName: othr.campgroundName, campgroundCode: othr.campgroundCode,longitude: 
       othr.longitude, latitude: othr.latitude, phoneNumber: othr.phoneNumber, campgroundType: othr.campgroundType,
-      numSites: othr.numSites, datesOpen: othr.datesOpen, similarity: distance}
+      numSites: othr.numSites, datesOpen: othr.datesOpen, similarity: similarScore}
   });
   //then sort the camp list by similarity
-  console.log("soriting by similarity")
   campSimilarity.sort((a, b) => a.similarity - b.similarity);
   return campSimilarity
+}
+
+
+//find ammenities score based on number of missing ammenities.
+function computeAmmenities(self, other){
+  let score = 0
+  let campAmmenities = self.amenities.split(" ")
+
+  if( other.amenities){
+    let otherAmmenites = other.amenities.split(" ")
+    let ammenityFound = false;
+
+    for(let i = 0; i < campAmmenities.length; i++){
+      ammenityFound = false;
+      let ammenity = campAmmenities[i]
+      for(let j =0; j < otherAmmenites.length; j++){
+        if (ammenity == otherAmmenites[j]){
+          ammenityFound = true
+        }
+      }
+      if (!ammenityFound){
+        score +=1
+      }
+    }
+  }
+
+  return score;
 }
 
 //compute the distance between two georaphical points.
