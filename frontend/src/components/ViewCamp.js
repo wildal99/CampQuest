@@ -32,12 +32,17 @@ const CampView = () => {
       });
   }, []);  
 
-console.log(campsList);
+console.log("raw list",campsList);
+
+let similarCamps = findSimilar(camp, campsList);
+console.log("similarly sorted list",similarCamps);
+
 
 
 return(
     <div className="view-camp-container">
-      {camp ? (
+      {/* wait until camp details are loaded to display the camp */}
+      {(camp)? (
         <>
         {/* Section for Map and Camp Details */}
         <div className = "map-camp-section" >
@@ -72,11 +77,23 @@ return(
           <h2> Similar Campgrounds </h2>
           <div className = "campgrounds">
 
+          {/*render empty similar campgrounds until similar campgrounds are found (loaded)*/}
 
-            <div className = "camping-card"></div>
-            <div className = "camping-card">Campground 2</div>
-            <div className = "camping-card">Campground 3</div>
-            <div className = "camping-card">Campground 4</div>
+          { similarCamps[1] ?
+          (  <>
+            <div className = "camping-card">{similarCamps[1].campgroundName}</div>
+            <div className = "camping-card">{similarCamps[2].campgroundName}</div>
+            <div className = "camping-card">{similarCamps[3].campgroundName}</div>
+            <div className = "camping-card">{similarCamps[4].campgroundName}</div>
+          </>
+          ) : (
+            <>
+            <div className = "camping-card">Loading Camp 1</div>
+            <div className = "camping-card">Loading Camp 2</div>
+            <div className = "camping-card">Loading Camp 3</div>
+            <div className = "camping-card">Loading Camp 4</div>
+            </>
+          ) }
           </div>
         </div> 
         </> 
@@ -88,21 +105,29 @@ return(
     );
 
   }
-
 export default CampView;
 
-function findSimilarity(self, others){
-  return others.map( othr=> {
-    const distance = computeDistance(self.latitude, self.longitude, othr.latitude, othr.longitude);
+
+//Find the similarity scores of all campgrounds, sort the camp list based on similarity.
+function findSimilar(self, others){
+
+  //map similarity onto the camp list
+  let campSimilarity =  others.map( othr=> {
+    //find distance between two camps
+    let distance = computeDistance(self.latitude, self.longitude, othr.latitude, othr.longitude);
     return {campgroundName: othr.campgroundName, campgroundCode: othr.campgroundCode,longitude: 
       othr.longitude, latitude: othr.latitude, phoneNumber: othr.phoneNumber, campgroundType: othr.campgroundType,
       numSites: othr.numSites, datesOpen: othr.datesOpen, similarity: distance}
   });
+  //then sort the camp list by similarity
+  console.log("soriting by similarity")
+  campSimilarity.sort((a, b) => a.similarity - b.similarity);
+  return campSimilarity
 }
 
+//compute the distance between two georaphical points.
 function computeDistance(latCurr, longCurr, latCamp, longCamp){
-  let dist= Math.acos((Math.sin(findRadians(latCurr)) * Math.sin(findRadians(latCamp))) + (Math.cos(findRadians(latCurr)) * Math.cos(findRadians(latCamp))) * (Math.cos(findRadians(longCamp) - findRadians(longCurr)))) * 6371;
-
+  let dist= Math.acos((Math.sin(findRadians(latCurr)) * Math.sin(findRadians(latCamp))) + (Math.cos(findRadians(latCurr)) * Math.cos(findRadians(latCamp))) * (Math.cos(findRadians(longCamp) - findRadians(longCurr)))) * 6371
   return dist
 }
 
@@ -110,6 +135,7 @@ function computeDistance(latCurr, longCurr, latCamp, longCamp){
 // convert degrees to radians.
 function findRadians(degrees)
 {
-  return degrees * (Math.pi/180);
+  let rads = degrees *(Math.PI/180);
+  return rads;
 }
 
