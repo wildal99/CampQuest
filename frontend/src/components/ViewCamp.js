@@ -30,6 +30,7 @@ const CampView = () => {
       .catch((error) => {
         console.log('Error fetching similar campgrounds:', error);
       });
+      
   }, []);  
 
 console.log("raw list",campsList);
@@ -81,10 +82,10 @@ return(
 
           { similarCamps[1] ?
           (  <>
-            <div className = "camping-card">{similarCamps[1].campgroundName}</div>
-            <div className = "camping-card">{similarCamps[2].campgroundName}</div>
-            <div className = "camping-card">{similarCamps[3].campgroundName}</div>
-            <div className = "camping-card">{similarCamps[4].campgroundName}</div>
+            <Link to = {"/view/" + similarCamps[1]._id} ><div className = "camping-card">{similarCamps[1].campgroundName}</div></Link>
+            <Link to = {"/view/" + similarCamps[2]._id} ><div className = "camping-card">{similarCamps[2].campgroundName}</div></Link>
+            <Link to = {"/view/" + similarCamps[3]._id} ><div className = "camping-card">{similarCamps[3].campgroundName}</div></Link>
+            <Link to = {"/view/" + similarCamps[4]._id} ><div className = "camping-card">{similarCamps[4].campgroundName}</div></Link>
           </>
           ) : (
             <>
@@ -115,7 +116,7 @@ function findSimilar(self, others){
   let campSimilarity =  others.map( othr=> {
     //find distance between two camps
     let distance = computeDistance(self.latitude, self.longitude, othr.latitude, othr.longitude);
-    return {campgroundName: othr.campgroundName, campgroundCode: othr.campgroundCode,longitude: 
+    return {_id: othr._id, campgroundName: othr.campgroundName, campgroundCode: othr.campgroundCode,longitude: 
       othr.longitude, latitude: othr.latitude, phoneNumber: othr.phoneNumber, campgroundType: othr.campgroundType,
       numSites: othr.numSites, datesOpen: othr.datesOpen, similarity: distance}
   });
