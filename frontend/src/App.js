@@ -1,4 +1,4 @@
-import logo from './logo2.svg';
+import logo from './CampQuest-logo.png';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
 import CampList from './components/CampList';
