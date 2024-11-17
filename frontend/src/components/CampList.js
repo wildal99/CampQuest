@@ -7,7 +7,32 @@ const CampList = () => {
   const [camps, setCamp] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");  // New state for search
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
   const campsPerPage = 12;
+  
+  /* Amenities List */
+  const amenitiesList = [ 
+    { code: 'NH', label: 'No Hookups'},
+    { code: 'E', label: 'Electric'},
+    { code: 'WE', label: 'Water & Electric'},
+    { code: 'WES', label: 'Water, Electric & Sewer'},
+    { code: 'DP', label: 'Dump'},
+    { code: 'ND', label: 'No Dump'},
+    { code: 'FT', label: 'Flush'},
+    { code: 'VT', label: 'Vault'},
+    { code: 'PT', label: 'Pit'},
+    { code: 'NT', label: 'No Toilets'},
+    { code: 'DW', label: 'Drinking Water'},
+    { code: 'NW', label: 'No Drinkng Water'},
+    { code: 'SH', label: 'Showers'},
+    { code: 'NS', label: 'No Showers'},
+    { code: 'RS', label: 'Accepts Reservations'},
+    { code: 'NR', label: 'No Reservations'},
+    { code: 'PA', label: 'Pets Allowed'},
+    { code: 'NP', label: 'No Pets Allowed'},
+    { code: 'L$', label: 'Free or Under $12'}
+
+  ]
 
   // Fetch campgrounds from backend
   useEffect(() => {
@@ -18,7 +43,27 @@ const CampList = () => {
       .catch((error) => {
         console.log('Error fetching campgrounds:', error);
       });
-  }, []);
+  }, [selectedAmenities]);
+
+  //Function to handle the amenity change toggle
+  const handleFilterChange = (e) => {
+    const amenity = e.target.value;
+    setSelectedAmenities(prev => {
+      if (prev.includes(amenity)) {
+        return prev.filter(item => item !== amenity);
+      }
+      else{
+        return [...prev, amenity];
+      }
+    });
+  };
+
+  //Filter by the selected amenities
+  const filterByAmenities = (camps) => {
+    return camps.filter(camp => 
+      selectedAmenities.every(amenity => camp.amenities.includes(amenity))
+      );
+  };
 
   // Filter camps based on search term
   const filteredCamps = camps.filter(camp =>
@@ -45,6 +90,22 @@ const CampList = () => {
 
   return (
     <div className="camp-list">
+
+      {/*  Amenity Filters */}
+      <div className="amenities-filter">
+        <h4>Filter By Amenities</h4>
+        {amenitiesList.map((amenity) => (
+          <label key ={amenity.code}>
+            <input 
+            type = "checkbox"
+            value = {amenity.code}
+            checked = {selectedAmenities.includes(amenity.code)}
+            onChange = {handleFilterChange} 
+            />
+            {amenity.label}
+          </label>
+        ))}
+      </div>
 
       {/* Search input */}
       <input className="searchText"

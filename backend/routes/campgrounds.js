@@ -3,8 +3,31 @@
 
     //GET all campgrounds
     router.route('/').get((req, res) =>{ 
-        Campground.find()
-            .then(campgrounds => res.json(campgrounds))
+
+        //creates query for database
+        let query = {};
+        let amenityFilter;
+
+        if(req.query.amenities){
+            amenityFilter = req.query.amenities.split(',');
+        }
+        else {
+            amenityFilter = [];
+        }
+
+        //Uses Reg Expression to match Amenities from amenitiesFilter[] to database
+        if(amenityFilter.length > 0) {
+            const regex = amenityFilter.map(amenity => `(?=.*${amenity})`).join('');
+            query.amenities = { $regex: regex, $options: 'i'};
+        }
+
+        Campground.find(query)
+            .then(campgrounds => {
+                if(campgrounds.length == 0){
+                    return res.status(200).json({ message: "No matching campgrounds."})
+                }
+                res.json(campgrounds);
+            })
             .catch(err => res.status(400).json('Error: ' + err));
     })
 
