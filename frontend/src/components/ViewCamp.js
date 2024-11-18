@@ -18,6 +18,7 @@ const CampView = () => {
         console.log('Error fetching campground details:', error);
       });
   }, [id]);
+
   // Mapping for amenities and types
   const amenitiesMap = {
     E: 'Electricity',
@@ -25,7 +26,7 @@ const CampView = () => {
     DW: 'Drinking Water',
     SH: 'Showers',
     RS: 'Restrooms',
-    PA: 'Pets Aloowed',
+    PA: 'Pets Allowed',
     NP: 'No Pets',
     PT: 'Pit Toilet',
     NH: 'No Hookups',
@@ -48,12 +49,13 @@ const CampView = () => {
 
   // Decode amenities
   const decodedAmenities = camp?.amenities
-    ?.split(' ')
-    .map(code => amenitiesMap[code] || code)
-    .join(', ');
+    ?.split(' ') // Split if it's a space-separated string
+    .map(code => amenitiesMap[code] || code) // Map to readable values or fallback to code
+    .join(', ') || 'N/A'; // Join back with commas or use fallback
 
   // Decode campground type
-  const decodedType = campgroundTypeMap[camp?.campgroundType] || camp?.campgroundType;
+  const decodedType = campgroundTypeMap[camp?.campgroundType] || 'N/A';
+
   const mapContainerStyle = {
     width: '100%',
     height: '300px',
@@ -84,14 +86,15 @@ const CampView = () => {
 
             <div className="camp-details">
               <h1>{camp.campgroundName}</h1>
-              <p><strong>Location:</strong> {camp.latitude}, {camp.longitude}</p>
-              <p><strong>City:</strong> {camp.city}</p>
-              <p><strong>State:</strong> {camp.state}</p>
-              <p><strong>Campground Type:</strong> {camp.campgroundType}</p>
-              <p><strong>Phone:</strong> {camp.phoneNumber}</p>
-              <p><strong>Number of Sites:</strong> {camp.numSites}</p>
+              <p><strong>Location:</strong> {camp.latitude || 'N/A'}, {camp.longitude || 'N/A'}</p>
+              <p><strong>City:</strong> {camp.city || 'N/A'}</p>
+              <p><strong>State:</strong> {camp.state || 'N/A'}</p>
+              <p><strong>Campground Type:</strong> {decodedType}</p>
+              <p><strong>Campground Amenities:</strong> {decodedAmenities}</p>
+              <p><strong>Phone:</strong> {camp.phoneNumber || 'N/A'}</p>
+              <p><strong>Number of Sites:</strong> {camp.numSites || 'N/A'}</p>
               <p><strong>Dates Open:</strong> {camp.datesOpen || 'N/A'}</p>
-              <Link to={"/"}>Back</Link>
+              <Link to="/">Back</Link>
             </div>
           </div>
 

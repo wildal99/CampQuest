@@ -32,6 +32,10 @@ const campgroundSchema = new mongoose.Schema({
     datesOpen: {
         type: String,
         required: false
+    },
+    amenities: {
+        type: String,
+        required: false
     }
     
 
