@@ -106,4 +106,43 @@
         .catch(err => res.status(400).json('Error: ' + err));
     });
 
+
+    router.get('/:id/reviews', async (req, res) => {
+        const { id } = req.params;
+        const { page = 1, limit = 5 } = req.query;
+      
+        try {
+          const campground = await Campground.findById(id).select('reviews');
+          if (!campground) return res.status(404).json({ message: 'Campground not found' });
+      
+          const startIndex = (page - 1) * limit;
+          const paginatedReviews = campground.reviews.slice(startIndex, startIndex + parseInt(limit));
+          const totalPages = Math.ceil(campground.reviews.length / limit);
+      
+          res.json({
+            reviews: paginatedReviews,
+            totalPages,
+          });
+        } catch (error) {
+          res.status(500).json({ message: 'Error fetching reviews', error });
+        }
+    });
+
+    router.post('/:id/reviews', async (req, res) => {
+        const { id } = req.params;
+        const { content } = req.body;
+
+        try {
+          const campground = await Campground.findById(id).select('reviews');
+          if (!campground) return res.status(404).json({ message: 'Campground not found' });
+      
+          campground.reviews.push({ content });
+          await campground.save();
+      
+          res.status(201).json({ message: 'Review submitted successfully' });
+        } catch (error) {
+          res.status(500).json({ message: 'Error submitting review', error });
+        }
+    });
+
     module.exports = router;
