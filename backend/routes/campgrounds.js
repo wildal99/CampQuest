@@ -14,7 +14,7 @@ router.route('/').get(async (req, res) => {
 
             if (amenitiesFilter.length > 0) {
                 query.amenities = { 
-                    $all: amenitiesFilter.map(amenity => new RegExp(amenity, 'i')) 
+                    $in: amenitiesFilter.map(amenity => new RegExp(amenity, 'i')) 
                 };
             }
 
