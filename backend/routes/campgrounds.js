@@ -4,40 +4,42 @@ let Campground = require('../models/campground_model');
 // GET all campgrounds with pagination and optional amenities filter
 router.route('/').get(async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 12; // Default to 12 items per page
-        const amenitiesFilter = req.query.amenities
-            ? req.query.amenities.split(',')
-            : [];
-        
-            let query = {};
-
-            if (amenitiesFilter.length > 0) {
-                query.amenities = { 
-                    $in: amenitiesFilter.map(amenity => new RegExp(amenity, 'i')) 
-                };
-            }
-
-            // Add type filtering
-            if (req.query.types) {
-                const typeFilter = req.query.types.split(',');
-                query.campgroundType = { $in: typeFilter };
-            }
-
-        const campgrounds = await Campground.find(query)
-            .skip((page - 1) * limit)
-            .limit(limit);
-
-        const totalCampgrounds = await Campground.countDocuments(query);
-        res.json({
-            campgrounds,
-            totalPages: Math.ceil(totalCampgrounds / limit),
-            currentPage: page,
-        });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 12;
+      const amenitiesFilter = req.query.amenities ? req.query.amenities.split(',') : [];
+      const typesFilter = req.query.types ? req.query.types.split(',') : [];
+      const statesFilter = req.query.states ? req.query.states.split(',') : [];
+  
+      let query = {};
+  
+      if (amenitiesFilter.length > 0) {
+        query.amenities = {
+          $in: amenitiesFilter.map((amenity) => new RegExp(amenity, 'i')),
+        };
+      }
+  
+      if (typesFilter.length > 0) {
+        query.campgroundType = { $in: typesFilter };
+      }
+  
+      if (statesFilter.length > 0) {
+        query.state = { $in: statesFilter };
+      }
+  
+      const campgrounds = await Campground.find(query)
+        .skip((page - 1) * limit)
+        .limit(limit);
+  
+      const totalCampgrounds = await Campground.countDocuments(query);
+      res.json({
+        campgrounds,
+        totalPages: Math.ceil(totalCampgrounds / limit),
+        currentPage: page,
+      });
     } catch (err) {
-        res.status(400).json('Error: ' + err);
+      res.status(400).json('Error: ' + err);
     }
-});
+  });
 
 // SEARCH campgrounds by name
 router.route('/search').get(async (req, res) => {

@@ -196,10 +196,10 @@ input.searchText{
 
 .dropdown-item {
   display: flex;
-  align-items: center;
   padding: 5px;
 }
 
 .dropdown-item input {
   margin-right: 8px;
+  
 }

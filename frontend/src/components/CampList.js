@@ -19,7 +19,16 @@ const CampList = () => {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const campsPerPage = 12;
+  const [selectedStates, setSelectedStates] = useState([]);
 
+  const statesList = [
+    { code: 'AL', label: 'Alabama' },
+    { code: 'AK', label: 'Alaska' },
+    { code: 'AZ', label: 'Arizona' },
+    { code: 'AR', label: 'Arkansas' },
+    { code: 'CA', label: 'California' },
+    // Add all states as needed
+  ];
   const campgroundTypeList = [
     { code: 'CP', label: 'County Park' },
     { code: 'COE', label: 'Corps of Engineers' },
@@ -179,6 +188,7 @@ useEffect(() => {
           setSelected={setSelectedTypes}
         />
       </div>
+      <br></br>
 
       {loading ? (
         <p>Loading camps...</p>
