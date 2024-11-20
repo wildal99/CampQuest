@@ -4,6 +4,7 @@ import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useParams, Link } from 'react-router-dom';
 import '../App.css';
 import '../DetailsPage.css';
+import ReviewList from './reviews/ReviewList';
 
 const CampView = () => {
   const { id } = useParams(); // Get the campground ID from the URL
@@ -98,8 +99,7 @@ const CampView = () => {
           {/* Review Section */}
           <div className="review-section">
             <h2>Leave a Review</h2>
-            <textarea placeholder="Leave a review..." />
-            <button>Submit</button>
+            <ReviewList campgroundId={id} />
           </div>
 
           {/* Similar Campgrounds */}
