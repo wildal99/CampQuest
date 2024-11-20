@@ -172,7 +172,7 @@ useEffect(() => {
         />
         <button type="submit">Search</button>
       </form>
-
+  
       {/* Filters */}
       <div className="filters">
         <DropdownCheckbox
@@ -187,9 +187,26 @@ useEffect(() => {
           selected={selectedTypes}
           setSelected={setSelectedTypes}
         />
+        <button
+          className="clear-filters"
+          onClick={() => {
+            setSearchTerm("");
+            setSelectedAmenities([]);
+            setSelectedTypes([]);
+            setSelectedStates([]);
+            setCurrentPage(1);
+            saveState('searchTerm', "");
+            saveState('selectedAmenities', []);
+            saveState('selectedTypes', []);
+            saveState('selectedStates', []);
+            fetchCamps(1);
+          }}
+        >
+          Clear Filters
+        </button>
       </div>
-      <br></br>
-
+      <br />
+  
       {loading ? (
         <p>Loading camps...</p>
       ) : (
@@ -213,7 +230,7 @@ useEffect(() => {
           )}
         </div>
       )}
-
+  
       {/* Pagination */}
       <div className="pagination">
         <button onClick={prevPage} disabled={currentPage === 1}>
