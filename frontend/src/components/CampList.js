@@ -4,10 +4,13 @@ import axios from 'axios';
 import '../App.css';
 
 const CampList = () => {
-  const [camps, setCamp] = useState([]);
+  const [camps, setCamp] = useState([]); // Initialize as an array
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");  // New state for search
   const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+
   const campsPerPage = 12;
   
   /* Amenities List */
@@ -34,62 +37,76 @@ const CampList = () => {
 
   ]
 
-  // Fetch campgrounds from backend
-  useEffect(() => {
-    axios.get('http://localhost:5000/camps/')
-      .then(response => {
-        setCamp(response.data);
-      })
-      .catch((error) => {
-        console.log('Error fetching campgrounds:', error);
+  const campgroundTypeMap = {
+    CP: 'County Park',
+    COE: 'Corps of Engineers',
+    NP: 'National Park',
+    NF: 'National Forest',
+    SP: 'State Park',
+    PP: 'Provincial Park',
+    RV: 'RV Park',
+    BML: 'Bureau of Land Management'
+  };
+
+  const fetchCamps = async (page = 1) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps/search`, {
+        params: {
+          q: searchTerm,
+          page,
+          limit: campsPerPage
+        }
       });
+      console.log('API response:', response.data); // Debugging line
+
+      const campgrounds = Array.isArray(response.data.campgrounds) ? response.data.campgrounds : [];
+      setCamp(campgrounds);
+      setTotalPages(response.data.totalPages || 1);
+      setCurrentPage(page);
+      setLoading(false);
+    } catch (error) {
+      console.log('Error fetching campgrounds:', error);
+      setCamp([]); // Ensure camps is an empty array on error
+      setLoading(false);
+    }
+  };
+  
+  // Fetch camps on initial load
+  useEffect(() => {
+    fetchCamps();
   }, [selectedAmenities]);
 
-  //Function to handle the amenity change toggle
-  const handleFilterChange = (e) => {
-    const amenity = e.target.value;
-    setSelectedAmenities(prev => {
-      if (prev.includes(amenity)) {
-        return prev.filter(item => item !== amenity);
-      }
-      else{
-        return [...prev, amenity];
-      }
-    });
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    fetchCamps(1); // Reset to first page on new search
   };
 
-  //Filter by the selected amenities
-  const filterByAmenities = (camps) => {
-    return camps.filter(camp => 
-      selectedAmenities.every(amenity => camp.amenities.includes(amenity))
-      );
-  };
-
-  // Filter camps based on search term
-  const filteredCamps = camps.filter(camp =>
-    camp.campgroundName.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Pagination logic
-  const indexOfLastCamp = currentPage * campsPerPage;
-  const indexOfFirstCamp = indexOfLastCamp - campsPerPage;
-  const currentCamps = filteredCamps.slice(indexOfFirstCamp, indexOfLastCamp);
-
-  // Change page
   const nextPage = () => {
-    if (currentPage < Math.ceil(filteredCamps.length / campsPerPage)) {
-      setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) {
+      fetchCamps(currentPage + 1);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      fetchCamps(currentPage - 1);
     }
   };
 
   return (
     <div className="camp-list">
+      <form onSubmit={handleSearchSubmit}>
+        <input
+          className="searchText"
+          type="text"
+          placeholder="Search camps by name..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+        <button type="submit">Search</button>
+      </form>
 
       {/*  Amenity Filters */}
       <div className="amenities-filter">
@@ -115,34 +132,39 @@ const CampList = () => {
         onChange={e => setSearchTerm(e.target.value)}
       />
       
-      <div className="camp-cards-container">
-        {currentCamps.length > 0 ? (
-          currentCamps.map(camp => (
-            <Link to = {"/view/" + camp._id} >
-            <div key={camp._id} className="camp-card">
-              <div className="camp-info">
-                <h2 className="camp-title">{camp.campgroundName}</h2>
-                <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {camp.campgroundType}</h4>
-                <div className="camp-actions">
-                  View
-                </div>
-              </div>
-            </div>
-            </Link>
-          ))
-        ) : (
-          <p>No camps available</p>
-        )}
-      </div>
+    
+      {loading ? (
+        <p>Loading camps...</p>
+      ) : (
+        <div className="camp-cards-container">
+          {camps.length > 0 ? (
+            camps.map(camp => {
+              const decodedType = campgroundTypeMap[camp.campgroundType] || camp.campgroundType;
+              return (
+                <Link to={"/view/" + camp._id} key={camp._id}>
+                  <div className="camp-card">
+                    <div className="camp-info">
+                      <h2 className="camp-title">{camp.campgroundName}</h2>
+                      <h4 className="camp-cord">City: {camp.city} | State: {camp.state} | Type: {decodedType}</h4>
+                      <div className="camp-actions">View</div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          ) : (
+            <p>No camps available</p>
+          )}
+        </div>
+      )}
 
-      {/* Pagination */}
       <div className="pagination">
         <button onClick={prevPage} disabled={currentPage === 1}>&lt;</button>
-        <span> Page {currentPage} of {Math.ceil(filteredCamps.length / campsPerPage)} </span>
-        <button onClick={nextPage} disabled={currentPage === Math.ceil(filteredCamps.length / campsPerPage)}>&gt;</button>
+        <span> Page {currentPage} of {totalPages} </span>
+        <button onClick={nextPage} disabled={currentPage === totalPages}>&gt;</button>
       </div>
     </div>
   );
-}
+};
 
 export default CampList;

@@ -37,6 +37,7 @@
 }
 
 /* Review Section */
+
 .review-section {
   width: 100%;
   max-width: 800px;
@@ -50,7 +51,8 @@
 .review-section h2 {
   margin-bottom: 10px;
 }
-
+/* Moved css to components/reviews css file */
+/*
 .review-section textarea {
   width: 90%;
   height: 100px;
@@ -67,7 +69,7 @@
   border-radius: 5px;
   cursor: pointer;
 }
-
+*/
 /* Similar Campgrounds */
 .similar-campgrounds {
   width: 80%;
