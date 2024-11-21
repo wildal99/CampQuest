@@ -82,6 +82,18 @@ const CampList = () => {
     e.preventDefault();
     fetchCamps(1); // Reset to first page on new search
   };
+  const handleFilterChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedAmenities((prevSelectedAmenities) => {
+      if (checked) {
+        // Add the selected amenity if it is checked
+        return [...prevSelectedAmenities, value];
+      } else {
+        // Remove the unselected amenity if it is unchecked
+        return prevSelectedAmenities.filter((amenity) => amenity !== value);
+      }
+    });
+  };
 
   const nextPage = () => {
     if (currentPage < totalPages) {
