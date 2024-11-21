@@ -44,7 +44,12 @@ const campgroundSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    amenities: {
+        type: String,
+        required: false
+    },
     reviews : [reviewSchema]
+
 
 },{ collection: 'ProductionCampsites' });
 

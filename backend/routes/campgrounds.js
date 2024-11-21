@@ -2,12 +2,37 @@
     let Campground = require('../models/campground_model');
 
     //GET all campgrounds
+
     // GET paginated campgrounds
     router.route('/').get(async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 12;  // Default to 12 items per page
+          //creates query for database
+        let query = {};
+        let amenityFilter;
 
+        if(req.query.amenities){
+            amenityFilter = req.query.amenities.split(',');
+        }
+        else {
+            amenityFilter = [];
+        }
+
+        //Uses Reg Expression to match Amenities from amenitiesFilter[] to database
+        if(amenityFilter.length > 0) {
+            const regex = amenityFilter.map(amenity => `(?=.*${amenity})`).join('');
+            query.amenities = { $regex: regex, $options: 'i'};
+        }
+
+        Campground.find(query)
+            .then(campgrounds => {
+                if(campgrounds.length == 0){
+                    return res.status(200).json({ message: "No matching campgrounds."})
+                }
+                res.json(campgrounds);
+            })
+            .catch(err => res.status(400).json('Error: ' + err));
             const campgrounds = await Campground.find()
                 .skip((page - 1) * limit)
                 .limit(limit);
