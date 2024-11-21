@@ -13,13 +13,40 @@ const loadState = (key, defaultValue) => {
 const CampList = () => {
   const [camps, setCamp] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");  // New state for search
   const [selectedAmenities, setSelectedAmenities] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const campsPerPage = 12;
+
   const [selectedStates, setSelectedStates] = useState([]);
+
+  
+  /* Amenities List */
+  const amenitiesList = [ 
+    { code: 'NH', label: 'No Hookups'},
+    { code: 'E', label: 'Electric'},
+    { code: 'WE', label: 'Water & Electric'},
+    { code: 'WES', label: 'Water, Electric & Sewer'},
+    { code: 'DP', label: 'Dump'},
+    { code: 'ND', label: 'No Dump'},
+    { code: 'FT', label: 'Flush'},
+    { code: 'VT', label: 'Vault'},
+    { code: 'PT', label: 'Pit'},
+    { code: 'NT', label: 'No Toilets'},
+    { code: 'DW', label: 'Drinking Water'},
+    { code: 'NW', label: 'No Drinkng Water'},
+    { code: 'SH', label: 'Showers'},
+    { code: 'NS', label: 'No Showers'},
+    { code: 'RS', label: 'Accepts Reservations'},
+    { code: 'NR', label: 'No Reservations'},
+    { code: 'PA', label: 'Pets Allowed'},
+    { code: 'NP', label: 'No Pets Allowed'},
+    { code: 'L$', label: 'Free or Under $12'}
+
+  ]
 
   const statesList = [
     { code: 'AL', label: 'Alabama' },
@@ -75,6 +102,8 @@ const CampList = () => {
         }
       });
 
+      console.log('API response:', response.data); // Debugging line
+
       const campgrounds = Array.isArray(response.data.campgrounds) ? response.data.campgrounds : [];
       setCamp(campgrounds);
       setTotalPages(response.data.totalPages || 1);
@@ -87,6 +116,7 @@ const CampList = () => {
     }
   };
 
+
   // Fetch camps on initial load and when filters/search terms change
   useEffect(() => {
     setSearchTerm(loadState('searchTerm', ""));
@@ -94,6 +124,7 @@ const CampList = () => {
     setSelectedTypes(loadState('selectedTypes', []));
     setCurrentPage(loadState('currentPage', 1));
 }, []);
+
 
 useEffect(() => {
     fetchCamps(currentPage);
@@ -104,6 +135,18 @@ useEffect(() => {
         return prev.filter(item => item !== value);
       }
       return [...prev, value];
+    });
+  };
+  const handleFilterChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedAmenities((prevSelectedAmenities) => {
+      if (checked) {
+        // Add the selected amenity if it is checked
+        return [...prevSelectedAmenities, value];
+      } else {
+        // Remove the unselected amenity if it is unchecked
+        return prevSelectedAmenities.filter((amenity) => amenity !== value);
+      }
     });
   };
 
@@ -172,6 +215,7 @@ useEffect(() => {
         />
         <button type="submit">Search</button>
       </form>
+
   
       {/* Filters */}
       <div className="filters">
@@ -207,6 +251,7 @@ useEffect(() => {
       </div>
       <br />
   
+
       {loading ? (
         <p>Loading camps...</p>
       ) : (

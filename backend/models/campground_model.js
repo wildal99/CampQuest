@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+const reviewSchema = new mongoose.Schema({
+    content: {
+        type: String,
+        required: true
+    }
+},
+    {
+        timestamps: true
+    }
+);
+
 const campgroundSchema = new mongoose.Schema({
     campgroundName: {
         type: String,
@@ -36,9 +47,8 @@ const campgroundSchema = new mongoose.Schema({
     amenities: {
         type: String,
         required: false
-    }
-    
-
+    },
+    reviews : [reviewSchema]
 },{ collection: 'ProductionCampsites' });
 
 const Campground = mongoose.model('Campground', campgroundSchema);

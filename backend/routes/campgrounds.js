@@ -1,6 +1,7 @@
 const router = require('express').Router();
 let Campground = require('../models/campground_model');
 
+
 // GET all campgrounds with pagination and optional amenities filter
 router.route('/').get(async (req, res) => {
     try {
@@ -47,6 +48,7 @@ router.route('/search').get(async (req, res) => {
         const searchTerm = req.query.q || '';
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
+
 
         const query = searchTerm
             ? { campgroundName: { $regex: searchTerm, $options: 'i' } }
@@ -145,4 +147,43 @@ router.route('/update/:id').post((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 });
 
-module.exports = router;
+    router.get('/:id/reviews', async (req, res) => {
+        const { id } = req.params;
+        const { page = 1, limit = 5 } = req.query;
+      
+        try {
+          const campground = await Campground.findById(id).select('reviews');
+          if (!campground) return res.status(404).json({ message: 'Campground not found' });
+      
+          const startIndex = (page - 1) * limit;
+          const paginatedReviews = campground.reviews.slice(startIndex, startIndex + parseInt(limit));
+          const totalPages = Math.ceil(campground.reviews.length / limit);
+      
+          res.json({
+            reviews: paginatedReviews,
+            totalPages,
+          });
+        } catch (error) {
+          res.status(500).json({ message: 'Error fetching reviews', error });
+        }
+    });
+
+    router.post('/:id/reviews', async (req, res) => {
+        const { id } = req.params;
+        const { content } = req.body;
+
+        try {
+          const campground = await Campground.findById(id).select('reviews');
+          if (!campground) return res.status(404).json({ message: 'Campground not found' });
+      
+          campground.reviews.push({ content });
+          await campground.save();
+      
+          res.status(201).json({ message: 'Review submitted successfully' });
+        } catch (error) {
+          res.status(500).json({ message: 'Error submitting review', error });
+        }
+    });
+
+    module.exports = router;
+

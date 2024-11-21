@@ -1,0 +1,58 @@
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    width: 100%; 
+    box-sizing: border-box;
+  }
+  
+  .review-form textarea {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; 
+    min-height: 100px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 100%; 
+    box-sizing: border-box; 
+  }
+  
+  .review-form textarea:focus {
+    border-color: #5a9bff; 
+  }
+  
+  .review-form button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%; 
+    box-sizing: border-box; 
+  }
+  
+  .review-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  .review-form button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
