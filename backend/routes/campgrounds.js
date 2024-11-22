@@ -2,12 +2,12 @@ const router = require('express').Router();
 const Campground = require('../models/campground_model');
 
 // Utility function to construct queries
-const buildQuery = ({ amenities, types, states }) => {
+const buildQuery = ({ campgroundName, amenities, types, states }) => {
   const query = {};
 
   if (amenities?.length) {
     query.amenities = {
-      $in: amenities.map((amenity) => new RegExp(amenity, 'i')),
+      $all: amenities.map((amenity) => new RegExp(amenity, 'i')),
     };
   }
 
@@ -17,6 +17,10 @@ const buildQuery = ({ amenities, types, states }) => {
 
   if (states?.length) {
     query.state = { $in: states };
+  }
+
+  if (campgroundName?.length) {
+    query.campgroundName = { $regex: campgroundName, $options: 'i'};
   }
 
   return query;
@@ -33,9 +37,10 @@ router.get('/', async (req, res) => {
   try {
     const { page, limit } = getPaginationParams(req);
     const query = buildQuery({
-      amenities: req.query.amenities?.split(','),
-      types: req.query.types?.split(','),
-      states: req.query.states?.split(','),
+      campgroundName: req.query?.q || '',
+      amenities: req.query?.amenities?.length > 0 ? req.query?.amenities?.split(',') : [],
+      types: req.query?.types?.length > 0 ? req.query?.types?.split(',') : [],
+      states: req.query?.states?.length > 0 ? req.query?.states?.split(',') : [],
     });
 
     const campgrounds = await Campground.find(query)

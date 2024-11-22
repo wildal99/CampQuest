@@ -64,6 +64,16 @@ const CampList = () => {
     { code: 'L$', label: 'Free or Under $12' }
   ];
 
+  const handleSearchFormSubmit = (event) => {
+    event.preventDefault();
+
+    const searchValue = event.target.search.value.trim();
+
+    if (searchValue !== searchTerm) {
+      setSearchTerm(searchValue)
+    }
+  }
+
   const fetchCamps = async (page = 1) => {
     setLoading(true);
     try {
@@ -147,13 +157,13 @@ const CampList = () => {
 
   return (
     <div className="camp-list">
-      <form onSubmit={e => { e.preventDefault(); fetchCamps(1); }}>
+      <form onSubmit={handleSearchFormSubmit}>
         <input
           className="searchText"
           type="text"
+          name="search"
           placeholder="Search camps by name..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          defaultValue={searchTerm}
         />
         <button type="submit">Search</button>
       </form>
