@@ -52,20 +52,6 @@ const CampView = () => {
   // Decode campground type
   const decodeType = (type) => campgroundTypeMap[type] || 'N/A';
 
-  // Compute distance between two geographical points
-  const computeDistance = (lat1, lon1, lat2, lon2) => {
-    const toRadians = (degrees) => degrees * (Math.PI / 180);
-    const R = 6371; // Earth radius in kilometers
-    const dLat = toRadians(lat2 - lat1);
-    const dLon = toRadians(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRadians(lat1)) *
-        Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) ** 2;
-    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  };
-
   // Fetch camp details
   useEffect(() => {
     axios
@@ -76,24 +62,13 @@ const CampView = () => {
       .catch((error) => console.error('Error fetching campground details:', error));
   }, [id]);
 
-  // Fetch similar campgrounds
+  // Fetch similar campgrounds  
   useEffect(() => {
     if (camp) {
       axios
-        .get(`${process.env.REACT_APP_API_URL}/camps`)
+        .get(`${process.env.REACT_APP_API_URL}/camps/nearest?lat=${camp.latitude}&lon=${camp.longitude}&id=${id}`)
         .then((response) => {
-          const otherCamps = response.data.filter((other) => other._id !== id);
-          const similarities = otherCamps.map((other) => ({
-            ...other,
-            similarity: computeDistance(
-              camp.latitude,
-              camp.longitude,
-              other.latitude,
-              other.longitude
-            ),
-          }));
-          similarities.sort((a, b) => a.similarity - b.similarity);
-          setSimilarCamps(similarities.slice(0, 4));
+          setSimilarCamps(response.data.closestCamps);
         })
         .catch((error) => console.error('Error fetching similar campgrounds:', error));
     }

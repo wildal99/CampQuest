@@ -59,6 +59,37 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/nearest', async (req, res) => {
+  try {
+    const { lat, lon, id } = req.query;
+    
+    if (!lat || !lon) {
+      return res.status(400).json({ message: 'Latitude and Longitude are required' });
+    }
+
+    const query = {
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [parseFloat(lon), parseFloat(lat)], 
+          },
+          $maxDistance: 50000, 
+        },
+      },
+      _id: { $ne: id },
+    };
+    
+    const closestCamps = await Campground.find(query)
+      .limit(4)
+      .exec();
+
+    res.json({ closestCamps });
+  } catch (err) {
+    res.status(400).json({ message: 'Error fetching nearest campgrounds', error: err });
+  }
+});
+
 // SEARCH campgrounds by name with pagination
 router.get('/search', async (req, res) => {
   try {
