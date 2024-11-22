@@ -1,189 +1,178 @@
 const router = require('express').Router();
-let Campground = require('../models/campground_model');
+const Campground = require('../models/campground_model');
 
+// Utility function to construct queries
+const buildQuery = ({ amenities, types, states }) => {
+  const query = {};
 
-// GET all campgrounds with pagination and optional amenities filter
-router.route('/').get(async (req, res) => {
-    try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 12;
-      const amenitiesFilter = req.query.amenities ? req.query.amenities.split(',') : [];
-      const typesFilter = req.query.types ? req.query.types.split(',') : [];
-      const statesFilter = req.query.states ? req.query.states.split(',') : [];
-  
-      let query = {};
-  
-      if (amenitiesFilter.length > 0) {
-        query.amenities = {
-          $in: amenitiesFilter.map((amenity) => new RegExp(amenity, 'i')),
-        };
-      }
-  
-      if (typesFilter.length > 0) {
-        query.campgroundType = { $in: typesFilter };
-      }
-  
-      if (statesFilter.length > 0) {
-        query.state = { $in: statesFilter };
-      }
-  
-      const campgrounds = await Campground.find(query)
-        .skip((page - 1) * limit)
-        .limit(limit);
-  
-      const totalCampgrounds = await Campground.countDocuments(query);
-      res.json({
-        campgrounds,
-        totalPages: Math.ceil(totalCampgrounds / limit),
-        currentPage: page,
-      });
-    } catch (err) {
-      res.status(400).json('Error: ' + err);
-    }
-  });
+  if (amenities?.length) {
+    query.amenities = {
+      $in: amenities.map((amenity) => new RegExp(amenity, 'i')),
+    };
+  }
 
-// SEARCH campgrounds by name
-router.route('/search').get(async (req, res) => {
-    try {
-        const searchTerm = req.query.q || '';
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 12;
+  if (types?.length) {
+    query.campgroundType = { $in: types };
+  }
 
+  if (states?.length) {
+    query.state = { $in: states };
+  }
 
-        const query = searchTerm
-            ? { campgroundName: { $regex: searchTerm, $options: 'i' } }
-            : {};
+  return query;
+};
 
-        const campgrounds = await Campground.find(query)
-            .skip((page - 1) * limit)
-            .limit(limit);
-
-        const totalResults = await Campground.countDocuments(query);
-        res.json({
-            campgrounds,
-            totalPages: Math.ceil(totalResults / limit),
-            currentPage: page,
-        });
-    } catch (err) {
-        res.status(400).json('Error: ' + err);
-    }
+// Utility function for pagination parameters
+const getPaginationParams = (req) => ({
+  page: parseInt(req.query.page) || 1,
+  limit: parseInt(req.query.limit) || 12,
 });
 
-// POST a campground
-router.route('/add').post((req, res) => {
-    const {
-        campgroundName,
-        campgroundCode,
-        longitude,
-        latitude,
-        phoneNumber,
-        campgroundType,
-        numSites,
-        datesOpen,
-        city,
-        state,
-        amenities,
-        nearestTownDistance,
-        nearestTownBearing,
-    } = req.body;
-
-    const newCampground = new Campground({
-        campgroundName,
-        campgroundCode,
-        longitude,
-        latitude,
-        phoneNumber,
-        campgroundType,
-        numSites,
-        datesOpen,
-        city,
-        state,
-        amenities,
-        nearestTownDistance,
-        nearestTownBearing,
+// GET all campgrounds with filters and pagination
+router.get('/', async (req, res) => {
+  try {
+    const { page, limit } = getPaginationParams(req);
+    const query = buildQuery({
+      amenities: req.query.amenities?.split(','),
+      types: req.query.types?.split(','),
+      states: req.query.states?.split(','),
     });
 
-    newCampground.save()
-        .then(() => res.json('Campground added!'))
-        .catch(err => res.status(400).json('Error: ' + err));
+    const campgrounds = await Campground.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalCampgrounds = await Campground.countDocuments(query);
+
+    res.json({
+      campgrounds,
+      totalPages: Math.ceil(totalCampgrounds / limit),
+      currentPage: page,
+    });
+  } catch (err) {
+    res.status(400).json({ message: 'Error fetching campgrounds', error: err });
+  }
+});
+
+// SEARCH campgrounds by name with pagination
+router.get('/search', async (req, res) => {
+  try {
+    const { page, limit } = getPaginationParams(req);
+    const searchTerm = req.query.q || '';
+
+    const query = searchTerm
+      ? { campgroundName: { $regex: searchTerm, $options: 'i' } }
+      : {};
+
+    const campgrounds = await Campground.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalResults = await Campground.countDocuments(query);
+
+    res.json({
+      campgrounds,
+      totalPages: Math.ceil(totalResults / limit),
+      currentPage: page,
+    });
+  } catch (err) {
+    res.status(400).json({ message: 'Error searching campgrounds', error: err });
+  }
+});
+
+// POST a new campground
+router.post('/add', async (req, res) => {
+  try {
+    const newCampground = new Campground(req.body);
+    await newCampground.save();
+    res.status(201).json({ message: 'Campground added!', campground: newCampground });
+  } catch (err) {
+    res.status(400).json({ message: 'Error adding campground', error: err });
+  }
 });
 
 // GET a specific campground's details
-router.route('/:id').get((req, res) => {
-    Campground.findById(req.params.id)
-        .then(campground => res.json(campground))
-        .catch(err => res.status(400).json('Error: ' + err));
+router.get('/:id', async (req, res) => {
+  try {
+    const campground = await Campground.findById(req.params.id);
+    if (!campground) {
+      return res.status(404).json({ message: 'Campground not found' });
+    }
+    res.json(campground);
+  } catch (err) {
+    res.status(400).json({ message: 'Error fetching campground details', error: err });
+  }
 });
 
 // DELETE a campground
-router.route('/:id').delete((req, res) => {
-    Campground.findByIdAndDelete(req.params.id)
-        .then(() => res.json('Campground deleted.'))
-        .catch(err => res.status(400).json('Error: ' + err));
+router.delete('/:id', async (req, res) => {
+  try {
+    const campground = await Campground.findByIdAndDelete(req.params.id);
+    if (!campground) {
+      return res.status(404).json({ message: 'Campground not found' });
+    }
+    res.json({ message: 'Campground deleted.' });
+  } catch (err) {
+    res.status(400).json({ message: 'Error deleting campground', error: err });
+  }
 });
 
 // UPDATE a campground
-router.route('/update/:id').post((req, res) => {
-    Campground.findById(req.params.id)
-        .then(campground => {
-            campground.campgroundName = req.body.campgroundName;
-            campground.campgroundCode = req.body.campgroundCode;
-            campground.longitude = Number(req.body.longitude);
-            campground.latitude = Number(req.body.latitude);
-            campground.phoneNumber = req.body.phoneNumber;
-            campground.campgroundType = req.body.campgroundType;
-            campground.numSites = Number(req.body.numSites);
-            campground.datesOpen = req.body.datesOpen;
-            campground.city = req.body.city;
-            campground.state = req.body.state;
-            campground.amenities = req.body.amenities;
-            campground.nearestTownDistance = req.body.nearestTownDistance;
-            campground.nearestTownBearing = req.body.nearestTownBearing;
+router.post('/update/:id', async (req, res) => {
+  try {
+    const campground = await Campground.findById(req.params.id);
+    if (!campground) {
+      return res.status(404).json({ message: 'Campground not found' });
+    }
 
-            campground.save()
-                .then(() => res.json('Campground updated!'))
-                .catch(err => res.status(400).json('Error: ' + err));
-        })
-        .catch(err => res.status(400).json('Error: ' + err));
+    Object.assign(campground, req.body);
+
+    await campground.save();
+    res.json({ message: 'Campground updated!', campground });
+  } catch (err) {
+    res.status(400).json({ message: 'Error updating campground', error: err });
+  }
 });
 
-    router.get('/:id/reviews', async (req, res) => {
-        const { id } = req.params;
-        const { page = 1, limit = 5 } = req.query;
-      
-        try {
-          const campground = await Campground.findById(id).select('reviews');
-          if (!campground) return res.status(404).json({ message: 'Campground not found' });
-      
-          const startIndex = (page - 1) * limit;
-          const paginatedReviews = campground.reviews.slice(startIndex, startIndex + parseInt(limit));
-          const totalPages = Math.ceil(campground.reviews.length / limit);
-      
-          res.json({
-            reviews: paginatedReviews,
-            totalPages,
-          });
-        } catch (error) {
-          res.status(500).json({ message: 'Error fetching reviews', error });
-        }
+// GET reviews for a specific campground with pagination
+router.get('/:id/reviews', async (req, res) => {
+  try {
+    const { page, limit } = getPaginationParams(req);
+    const campground = await Campground.findById(req.params.id).select('reviews');
+
+    if (!campground) {
+      return res.status(404).json({ message: 'Campground not found' });
+    }
+
+    const startIndex = (page - 1) * limit;
+    const paginatedReviews = campground.reviews.slice(startIndex, startIndex + limit);
+
+    res.json({
+      reviews: paginatedReviews,
+      totalPages: Math.ceil(campground.reviews.length / limit),
     });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching reviews', error: err });
+  }
+});
 
-    router.post('/:id/reviews', async (req, res) => {
-        const { id } = req.params;
-        const { content } = req.body;
+// POST a review for a specific campground
+router.post('/:id/reviews', async (req, res) => {
+  try {
+    const { content } = req.body;
+    const campground = await Campground.findById(req.params.id);
 
-        try {
-          const campground = await Campground.findById(id).select('reviews');
-          if (!campground) return res.status(404).json({ message: 'Campground not found' });
-      
-          campground.reviews.push({ content });
-          await campground.save();
-      
-          res.status(201).json({ message: 'Review submitted successfully' });
-        } catch (error) {
-          res.status(500).json({ message: 'Error submitting review', error });
-        }
-    });
+    if (!campground) {
+      return res.status(404).json({ message: 'Campground not found' });
+    }
 
-    module.exports = router;
+    campground.reviews.push({ content });
+    await campground.save();
 
+    res.status(201).json({ message: 'Review submitted successfully', review: { content } });
+  } catch (err) {
+    res.status(500).json({ message: 'Error submitting review', error: err });
+  }
+});
+
+module.exports = router;
