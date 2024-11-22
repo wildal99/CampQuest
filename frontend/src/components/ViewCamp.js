@@ -4,7 +4,7 @@ import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useParams, Link } from 'react-router-dom';
 import '../App.css';
 import '../DetailsPage.css';
-
+import ReviewList from './reviews/ReviewList';
 const CampView = () => {
   const { id } = useParams();
   const [camp, setCamp] = useState(null);
@@ -107,7 +107,10 @@ const CampView = () => {
               <Link to="/">Back</Link>
             </div>
           </div>
-
+          <div className="review-section">
+            <h2>Leave a Review</h2>
+            <ReviewList campgroundId={id} />
+          </div>
           {/* Similar Campgrounds */}
           <div className="similar-campgrounds">
             <h2>Similar Campgrounds</h2>
