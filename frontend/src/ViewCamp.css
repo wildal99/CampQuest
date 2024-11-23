@@ -1,0 +1,83 @@
+/* General Styles */
+.view-camp-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers horizontally */
+    justify-content: center; /* Centers vertically if height is constrained */
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  /* Map and Camp Details Section */
+  .map-camp-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 800px; /* Limits the width for larger screens */
+  }
+  
+  .map-container {
+    width: 100%;
+    height: 300px;
+  }
+  
+  .camp-details {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    width: 100%;
+  }
+  
+  /* Review Section */
+  .review-section, .similar-campgrounds {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+  }
+  
+  /* Similar Campgrounds Section */
+  .campgrounds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center; /* Centers cards in the container */
+  }
+  
+  .camping-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1 1 100%;
+    max-width: 300px; /* Limit individual card width */
+  }
+  
+  /* Responsive Styles */
+  @media screen and (min-width: 768px) {
+    .map-camp-section {
+      flex-direction: row;
+      gap: 20px;
+      align-items: flex-start; /* Adjust for side-by-side layout */
+    }
+  
+    .map-container, .camp-details {
+      flex: 1;
+    }
+  
+    .campgrounds {
+      justify-content: center; /* Ensures centering for the grid layout */
+    }
+  
+    .camping-card {
+      flex: 1 1 calc(33.333% - 10px); /* 3 cards per row for larger screens */
+      max-width: none;
+    }
+  }
