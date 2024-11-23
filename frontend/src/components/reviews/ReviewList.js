@@ -12,7 +12,7 @@ const ReviewList = ({ campgroundId }) => {
 
   useEffect(() => {
     setIsLoading(true);
-    axios.get(`${process.env.REACT_APP_API_URL}/camps/${campgroundId}/reviews?page=${currentPage}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/camps/${campgroundId}/reviews?page=${currentPage}&limit=5`)
       .then(response => {
         // Ensure reviews is always an array
         setReviews(response.data.reviews || []);
