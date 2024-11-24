@@ -92,14 +92,14 @@ const CampList = () => {
     { code: 'E', label: 'Electric' },
     { code: 'WE', label: 'Water & Electric' },
     { code: 'WES', label: 'Water, Electric & Sewer' },
-    { code: '23ft', label: '32 Feet Max RV Length'},
+    { code: '23ft', label: '32 Feet Max RV Length' },
     { code: 'DP', label: 'Dump Station' },
     { code: 'ND', label: 'No Dump Station' },
     { code: 'FT', label: 'Flush Toilets' },
     { code: 'VT', label: 'Vault Toilets' },
     { code: 'PT', label: 'Pit Toilets' },
     { code: 'NT', label: 'No Toilets' },
-    { code: 'FTVT', label: 'Flush and Vault Toilets'},
+    { code: 'FTVT', label: 'Flush and Vault Toilets' },
     { code: 'DW', label: 'Drinking Water' },
     { code: 'NW', label: 'No Drinking Water' },
     { code: 'SH', label: 'Showers' },
@@ -229,7 +229,7 @@ const CampList = () => {
           selected={selectedTypes}
           setSelected={setSelectedTypes}
         />
-                <DropdownCheckbox
+        <DropdownCheckbox
           label="Filter by State"
           options={statesList}
           selected={selectedStates}
@@ -257,18 +257,27 @@ const CampList = () => {
       ) : (
         <div className="camp-cards-container">
           {camps.length > 0 ? (
-            camps.map(camp => (
-              <Link to={`/view/${camp._id}`} key={camp._id}>
-                <div className="camp-card">
-                  <div className="camp-info">
-                    <h2 className="camp-title">{camp.campgroundName}</h2>
-                    <h4 className="camp-cord">
-                      City: {camp.city} | State: {camp.state} | Type: {campgroundTypeList.find(type => type.code === camp.campgroundType)?.label || camp.campgroundType}
-                    </h4>
+            camps.map(camp => {
+              const randomImageUrl = `https://random.imagecdn.app/v1/image?width=300&height=200&category=nature&format=image&unique=${camp._id}`;
+
+              return (
+                <Link to={`/view/${camp._id}`} key={camp._id}>
+                  <div className="camp-card"
+                    style={{
+                      backgroundImage: `url(${randomImageUrl})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center"
+                    }}>
+                    <div className="camp-info">
+                      <h2 className="camp-title">{camp.campgroundName}</h2>
+                      <h4 className="camp-cord">
+                        City: {camp.city} | State: {camp.state} | Type: {campgroundTypeList.find(type => type.code === camp.campgroundType)?.label || camp.campgroundType}
+                      </h4>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))
+                </Link>
+              )
+            })
           ) : (
             <p>No camps available</p>
           )}
