@@ -48,10 +48,19 @@ const campgroundSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point']
+        },
+        coordinates: {
+            type: [Number]
+        }
+    },
     reviews : [reviewSchema]
-
-
 },{ collection: 'ProductionCampsites' });
+
+campgroundSchema.index({ location: '2dsphere' });
 
 const Campground = mongoose.model('Campground', campgroundSchema);
 module.exports = Campground;
