@@ -12,18 +12,26 @@ const CampView = () => {
 
   const amenitiesMap = {
     E: 'Electricity',
-    DP: 'Dump Station',
-    DW: 'Drinking Water',
-    SH: 'Showers',
-    RS: 'Restrooms',
-    PA: 'Pets Allowed',
-    NP: 'No Pets',
-    PT: 'Pit Toilet',
-    NH: 'No Hookups',
-    L$: 'Free or under $12',
-    ND: 'No Dump Station',
     WE: 'Water Electricity',
     WES: 'Water Electricity Sewer',
+    L$: 'Free or under $12',
+    DW: 'Drinking Water',
+    NW: 'No Drinking Water',
+    SH: 'Showers',
+    NS: 'No Showers',
+    RS: 'Accepts Reservations',
+    NR: 'No Reservations',
+    PA: 'Pets Allowed',
+    NP: 'No Pets',
+    "23ft": '32 Feet Max RV Length',
+    NH: 'No Hookups',
+    DP: 'Dump Station',
+    ND: 'No Dump Station',
+    PT: 'Pit Toilet',
+    FT: 'Flush Toilets',
+    NT: 'No Toilets',
+    VT: 'Vault Toilet',
+    FTVT: 'Flush and Vault Toilets'
   };
 
   const campgroundTypeMap = {
