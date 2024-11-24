@@ -179,7 +179,7 @@ const CampView = () => {
           </div>
           {/* Similar Campgrounds */}
           <div className="similar-campgrounds">
-            <h2>Similar Campgrounds</h2>
+            <h2>Nearby Campgrounds</h2>
             <div className="campgrounds">
               {similarCamps.length > 0 ? (
                 similarCamps.map((similarCamp) => (
