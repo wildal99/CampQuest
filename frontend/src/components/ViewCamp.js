@@ -11,9 +11,9 @@ const CampView = () => {
   const [similarCamps, setSimilarCamps] = useState([]);
 
   const amenitiesMap = {
-    E: 'Electricity',
-    WE: 'Water Electricity',
-    WES: 'Water Electricity Sewer',
+    E: 'Electric',
+    WE: 'Water & Electric',
+    WES: 'Water, Electric & Sewer',
     L$: 'Free or under $12',
     DW: 'Drinking Water',
     NW: 'No Drinking Water',
@@ -22,7 +22,7 @@ const CampView = () => {
     RS: 'Accepts Reservations',
     NR: 'No Reservations',
     PA: 'Pets Allowed',
-    NP: 'No Pets',
+    NP: 'No Pets Allowed',
     "23ft": '32 Feet Max RV Length',
     NH: 'No Hookups',
     DP: 'Dump Station',
@@ -43,6 +43,59 @@ const CampView = () => {
     PP: 'Provincial Park',
     RV: 'RV Park',
     BML: 'Bureau of Land Management',
+  };
+
+  const statesMap = {
+    AL: "Alabama",
+    AK: "Alaska",
+    AZ: "Arizona",
+    AR: "Arkansas",
+    CA: "California",
+    CO: "Colorado",
+    CT: "Connecticut",
+    DE: "Delaware",
+    FL: "Florida",
+    GA: "Georgia",
+    HI: "Hawaii",
+    ID: "Idaho",
+    IL: "Illinois",
+    IN: "Indiana",
+    IA: "Iowa",
+    KS: "Kansas",
+    KY: "Kentucky",
+    LA: "Louisiana",
+    ME: "Maine",
+    MD: "Maryland",
+    MA: "Massachusetts",
+    MI: "Michigan",
+    MN: "Minnesota",
+    MS: "Mississippi",
+    MO: "Missouri",
+    MT: "Montana",
+    NE: "Nebraska",
+    NV: "Nevada",
+    NH: "New Hampshire",
+    NJ: "New Jersey",
+    NM: "New Mexico",
+    NY: "New York",
+    NC: "North Carolina",
+    ND: "North Dakota",
+    OH: "Ohio",
+    OK: "Oklahoma",
+    OR: "Oregon",
+    PA: "Pennsylvania",
+    RI: "Rhode Island",
+    SC: "South Carolina",
+    SD: "South Dakota",
+    TN: "Tennessee",
+    TX: "Texas",
+    UT: "Utah",
+    VT: "Vermont",
+    VA: "Virginia",
+    WA: "Washington",
+    WV: "West Virginia",
+    WI: "Wisconsin",
+    WY: "Wyoming",
   };
 
   const mapContainerStyle = {
@@ -106,7 +159,7 @@ const CampView = () => {
               <h1>{camp.campgroundName}</h1>
               <p><strong>Location:</strong> {camp.latitude || 'N/A'}, {camp.longitude || 'N/A'}</p>
               <p><strong>City:</strong> {camp.city || 'N/A'}</p>
-              <p><strong>State:</strong> {camp.state || 'N/A'}</p>
+              <p><strong>State:</strong> {camp.state && statesMap[camp.state] ? statesMap[camp.state] : 'N/A'}</p>
               <p><strong>Campground Type:</strong> {decodeType(camp.campgroundType)}</p>
               <p><strong>Campground Amenities:</strong> {decodeAmenities(camp.amenities)}</p>
               <p><strong>Phone:</strong> {camp.phoneNumber || 'N/A'}</p>
