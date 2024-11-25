@@ -19,6 +19,7 @@ const CampList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedStates, setSelectedStates] = useState([]);
   const [loading, setLoading] = useState(true);
   const campsPerPage = 12;
 
@@ -28,7 +29,51 @@ const CampList = () => {
     { code: 'AZ', label: 'Arizona' },
     { code: 'AR', label: 'Arkansas' },
     { code: 'CA', label: 'California' },
-    // Add all states as needed
+    { code: 'CO', label: 'Colorado' },
+    { code: 'CT', label: 'Connecticut' },
+    { code: 'DE', label: 'Delaware' },
+    { code: 'FL', label: 'Florida' },
+    { code: 'GA', label: 'Georgia' },
+    { code: 'HI', label: 'Hawaii' },
+    { code: 'ID', label: 'Idaho' },
+    { code: 'IL', label: 'Illinois' },
+    { code: 'IN', label: 'Indiana' },
+    { code: 'IA', label: 'Iowa' },
+    { code: 'KS', label: 'Kansas' },
+    { code: 'KY', label: 'Kentucky' },
+    { code: 'LA', label: 'Louisiana' },
+    { code: 'ME', label: 'Maine' },
+    { code: 'MD', label: 'Maryland' },
+    { code: 'MA', label: 'Massachusetts' },
+    { code: 'MI', label: 'Michigan' },
+    { code: 'MN', label: 'Minnesota' },
+    { code: 'MS', label: 'Mississippi' },
+    { code: 'MO', label: 'Missouri' },
+    { code: 'MT', label: 'Montana' },
+    { code: 'NE', label: 'Nebraska' },
+    { code: 'NV', label: 'Nevada' },
+    { code: 'NH', label: 'New Hampshire' },
+    { code: 'NJ', label: 'New Jersey' },
+    { code: 'NM', label: 'New Mexico' },
+    { code: 'NY', label: 'New York' },
+    { code: 'NC', label: 'North Carolina' },
+    { code: 'ND', label: 'North Dakota' },
+    { code: 'OH', label: 'Ohio' },
+    { code: 'OK', label: 'Oklahoma' },
+    { code: 'OR', label: 'Oregon' },
+    { code: 'PA', label: 'Pennsylvania' },
+    { code: 'RI', label: 'Rhode Island' },
+    { code: 'SC', label: 'South Carolina' },
+    { code: 'SD', label: 'South Dakota' },
+    { code: 'TN', label: 'Tennessee' },
+    { code: 'TX', label: 'Texas' },
+    { code: 'UT', label: 'Utah' },
+    { code: 'VT', label: 'Vermont' },
+    { code: 'VA', label: 'Virginia' },
+    { code: 'WA', label: 'Washington' },
+    { code: 'WV', label: 'West Virginia' },
+    { code: 'WI', label: 'Wisconsin' },
+    { code: 'WY', label: 'Wyoming' },
   ];
 
   const campgroundTypeList = [
@@ -47,12 +92,19 @@ const CampList = () => {
     { code: 'E', label: 'Electric' },
     { code: 'WE', label: 'Water & Electric' },
     { code: 'WES', label: 'Water, Electric & Sewer' },
-    { code: 'DP', label: 'Dump' },
-    { code: 'ND', label: 'No Dump' },
+    { code: '23ft', label: '23 Feet Max RV Length' },
+    { code: "40ft", label: '40 Feet Max RV Length'},
+    { code: "45ft", label: '45 Feet Max RV Length'},
+    { code: "50ft", label: '50 Feet Max RV Length'},
+    { code: "60ft", label: '60 Feet Max RV Length'},
+    { code: "100ft", label: '100 Feet Max RV Length'},
+    { code: 'DP', label: 'Dump Station' },
+    { code: 'ND', label: 'No Dump Station' },
     { code: 'FT', label: 'Flush Toilets' },
     { code: 'VT', label: 'Vault Toilets' },
     { code: 'PT', label: 'Pit Toilets' },
     { code: 'NT', label: 'No Toilets' },
+    { code: 'FTVT', label: 'Flush and Vault Toilets' },
     { code: 'DW', label: 'Drinking Water' },
     { code: 'NW', label: 'No Drinking Water' },
     { code: 'SH', label: 'Showers' },
@@ -82,6 +134,7 @@ const CampList = () => {
           q: searchTerm,
           amenities: selectedAmenities.join(','),
           types: selectedTypes.join(','),
+          states: selectedStates.join(','),
           page,
           limit: campsPerPage
         }
@@ -108,7 +161,7 @@ const CampList = () => {
 
   useEffect(() => {
     fetchCamps(currentPage);
-  }, [searchTerm, selectedAmenities, selectedTypes, currentPage]);
+  }, [searchTerm, selectedAmenities, selectedTypes, currentPage, selectedStates]);
 
   useEffect(() => {
     saveState('searchTerm', searchTerm);
@@ -181,6 +234,12 @@ const CampList = () => {
           selected={selectedTypes}
           setSelected={setSelectedTypes}
         />
+        <DropdownCheckbox
+          label="Filter by State"
+          options={statesList}
+          selected={selectedStates}
+          setSelected={setSelectedStates}
+        />
         <button
           className="clear-filters"
           onClick={() => {
@@ -203,18 +262,27 @@ const CampList = () => {
       ) : (
         <div className="camp-cards-container">
           {camps.length > 0 ? (
-            camps.map(camp => (
-              <Link to={`/view/${camp._id}`} key={camp._id}>
-                <div className="camp-card">
-                  <div className="camp-info">
-                    <h2 className="camp-title">{camp.campgroundName}</h2>
-                    <h4 className="camp-cord">
-                      City: {camp.city} | State: {camp.state} | Type: {campgroundTypeList.find(type => type.code === camp.campgroundType)?.label || camp.campgroundType}
-                    </h4>
+            camps.map(camp => {
+              const randomImageUrl = `https://random.imagecdn.app/v1/image?width=300&height=200&category=nature&format=image&unique=${camp._id}`;
+
+              return (
+                <Link to={`/view/${camp._id}`} key={camp._id}>
+                  <div className="camp-card"
+                    style={{
+                      backgroundImage: `url(${randomImageUrl})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center"
+                    }}>
+                    <div className="camp-info">
+                      <h2 className="camp-title">{camp.campgroundName}</h2>
+                      <h4 className="camp-cord">
+                        City: {camp.city} | State: {camp.state} | Type: {campgroundTypeList.find(type => type.code === camp.campgroundType)?.label || camp.campgroundType}
+                      </h4>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))
+                </Link>
+              )
+            })
           ) : (
             <p>No camps available</p>
           )}

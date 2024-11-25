@@ -82,8 +82,6 @@ input.searchText{
 }
 
 .camp-card {
-  background-image: url("camp.jpg");
-  background-size: contain;
   display: flex;
   background-color: #f9f9f9;
   border-radius: 8px;
