@@ -6,92 +6,59 @@ require('dotenv').config();
 router.get('/image', async (req, res) => {
   try {
     const { query } = req.query;
-    
-    // Validate input
+
     if (!query) {
       return res.status(400).json({ message: 'Query parameter is required' });
     }
 
-    // Log the incoming request for debugging
-    console.log('Received image search query:', query);
-
-    // Ensure API key is set
     if (!process.env.GOOGLE_PLACES_API_KEY) {
       return res.status(500).json({ message: 'Google Places API key is not configured' });
     }
 
-    // Make Places API request
-    let placesResponse;
-    try {
-      placesResponse = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
-        params: {
-          query: query,
-          key: process.env.GOOGLE_PLACES_API_KEY,
-          type: 'campground'
-        }
-      });
-
-      // Log the Places API response
-      console.log('Places API Response:', JSON.stringify(placesResponse.data, null, 2));
-    } catch (apiError) {
-      console.error('Places API Request Error:', apiError.response ? apiError.response.data : apiError.message);
-      return res.status(500).json({ 
-        message: 'Error searching for place', 
-        error: apiError.response ? apiError.response.data : apiError.message 
-      });
-    }
-
-    // Check if results exist
-    if (!placesResponse.data.results || placesResponse.data.results.length === 0) {
-      return res.status(404).json({ 
-        message: 'No campground found',
-        query: query
-      });
-    }
-
-    // Check if photos exist
-    const firstResult = placesResponse.data.results[0];
-    if (!firstResult.photos || firstResult.photos.length === 0) {
-      return res.status(404).json({ 
-        message: 'No photos found for the campground',
-        place: firstResult.name
-      });
-    }
-    
-    // Get photo reference
-    const photoReference = firstResult.photos[0].photo_reference;
-    
-    // Fetch photo
-    try {
-      const imageResponse = await axios.get('https://maps.googleapis.com/maps/api/place/photo', {
-        params: {
-          maxwidth: 400,
-          photoreference: photoReference,
-          key: process.env.GOOGLE_PLACES_API_KEY
-        },
-        responseType: 'text'
-      });
-
-      // Return the image URL
-      res.json({ 
-        imageUrl: imageResponse.request.res.responseUrl,
-        placeName: firstResult.name
-      });
-    } catch (photoError) {
-      console.error('Photo Fetch Error:', photoError.message);
-      return res.status(500).json({ 
-        message: 'Error fetching photo', 
-        error: photoError.message 
-      });
-    }
-  } catch (error) {
-    console.error('Unexpected error:', error);
-    res.status(500).json({ 
-      message: 'Unexpected error occurred', 
-      error: error.message 
+    const placesResponse = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
+      params: {
+        query,
+        key: process.env.GOOGLE_PLACES_API_KEY,
+        type: 'campground',
+      },
     });
+
+    const results = placesResponse.data.results;
+
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: 'No campgrounds found' });
+    }
+
+    const firstResult = results[0];
+    const photoReference = firstResult.photos?.[0]?.photo_reference;
+
+    if (!photoReference) {
+      return res.json({
+        imageUrl: null,
+        placeName: firstResult.name,
+      });
+    }
+
+    const imageResponse = await axios.get('https://maps.googleapis.com/maps/api/place/photo', {
+      params: {
+        maxwidth: 400,
+        photoreference: photoReference,
+        key: process.env.GOOGLE_PLACES_API_KEY,
+      },
+      responseType: 'text',
+    });
+
+    res.json({
+      imageUrl: imageResponse.request.res.responseUrl,
+      placeName: firstResult.name,
+    });
+  } catch (error) {
+    console.error('Error fetching image:', error.message);
+    res.status(500).json({ message: 'Unexpected error occurred', error: error.message });
   }
 });
+
+
 // Utility function to construct queries
 const buildQuery = ({ campgroundName, amenities, types, states }) => {
   const query = {};
