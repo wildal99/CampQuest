@@ -84,11 +84,15 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
-.camping-card {
+.similar-camp-card {
   background-color: white;
   padding: 10px;
   border-radius: 5px;
   text-align: center;
+  border-style: dashed;
+  border-color: green;
+  color: Black;
+  min-height: 150px;
 }
 
   

@@ -50,7 +50,7 @@
     justify-content: center; /* Centers cards in the container */
   }
   
-  .camping-card {
+  .similar-camp-card{
     background-color: #f9f9f9;
     border-radius: 8px;
     padding: 10px;
@@ -76,7 +76,7 @@
       justify-content: center; /* Ensures centering for the grid layout */
     }
   
-    .camping-card {
+    .similar-camp-card {
       flex: 1 1 calc(33.333% - 10px); /* 3 cards per row for larger screens */
       max-width: none;
     }
