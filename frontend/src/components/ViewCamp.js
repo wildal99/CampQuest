@@ -186,8 +186,8 @@ const CampView = () => {
                   <Link to={`/view/${similarCamp._id}`} key={similarCamp._id}>
                     <div className="similar-camp-card">
                       <h3 data-testid="similar-camp-name">{similarCamp.campgroundName}</h3>
-                      <p>location: {similarCamp.city}, {similarCamp.state}</p>
-                      <p>Type: {decodeType(similarCamp.campgroundType)}</p>
+                      <p>{similarCamp.city}, {similarCamp.state}</p>
+                      <p>{decodeType(similarCamp.campgroundType)}</p>
                       </div>
                   </Link>
                 ))
