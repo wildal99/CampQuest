@@ -15,46 +15,69 @@ router.get('/image', async (req, res) => {
       return res.status(500).json({ message: 'Google Places API key is not configured' });
     }
 
-    const placesResponse = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
-      params: {
-        query,
-        key: process.env.GOOGLE_PLACES_API_KEY,
-        type: 'campground',
-      },
-    });
+    // Generate multiple search variations
+    const searchQueries = [
+      query,
+      query.replace('campground', '').trim(),
+      query.split(',')[0],
+      `${query.split(',')[0]} campground`,
+      `campground near ${query}`,
+      `camping ${query}`
+    ];
 
-    const results = placesResponse.data.results;
+    for (const searchQuery of searchQueries) {
+      try {
+        // Search for places
+        const placesResponse = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
+          params: {
+            query: searchQuery,
+            key: process.env.GOOGLE_PLACES_API_KEY,
+            type: 'campground'
+          }
+        });
 
-    if (!results || results.length === 0) {
-      return res.status(404).json({ message: 'No campgrounds found' });
+        const results = placesResponse.data.results;
+        
+        // If no results, continue to next query
+        if (!results || results.length === 0) continue;
+
+        // Try to find an image in the results
+        for (const result of results) {
+          const photoReference = result.photos?.[0]?.photo_reference;
+
+          if (photoReference) {
+            const imageResponse = await axios.get('https://maps.googleapis.com/maps/api/place/photo', {
+              params: {
+                maxwidth: 400,
+                photoreference: photoReference,
+                key: process.env.GOOGLE_PLACES_API_KEY
+              },
+              responseType: 'text'
+            });
+
+            return res.json({
+              imageUrl: imageResponse.request.res.responseUrl,
+              placeName: result.name
+            });
+          }
+        }
+      } catch (searchError) {
+        console.error(`Error with search query ${searchQuery}:`, searchError.message);
+      }
     }
 
-    const firstResult = results[0];
-    const photoReference = firstResult.photos?.[0]?.photo_reference;
-
-    if (!photoReference) {
-      return res.json({
-        imageUrl: null,
-        placeName: firstResult.name,
-      });
-    }
-
-    const imageResponse = await axios.get('https://maps.googleapis.com/maps/api/place/photo', {
-      params: {
-        maxwidth: 400,
-        photoreference: photoReference,
-        key: process.env.GOOGLE_PLACES_API_KEY,
-      },
-      responseType: 'text',
+    // If no image found after all queries
+    return res.json({
+      imageUrl: null,
+      placeName: null
     });
 
-    res.json({
-      imageUrl: imageResponse.request.res.responseUrl,
-      placeName: firstResult.name,
-    });
   } catch (error) {
-    console.error('Error fetching image:', error.message);
-    res.status(500).json({ message: 'Unexpected error occurred', error: error.message });
+    console.error('Comprehensive image fetch error:', error);
+    res.status(500).json({ 
+      message: 'Unexpected error in image retrieval',
+      error: error.message 
+    });
   }
 });
 
