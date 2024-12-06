@@ -11,7 +11,7 @@ router.get('/image', async (req, res) => {
       return res.status(400).json({ message: 'Query parameter is required' });
     }
 
-    if (!process.env.GOOGLE_PLACES_API_KEY) {
+    if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY) {
       return res.status(500).json({ message: 'Google Places API key is not configured' });
     }
 
@@ -31,7 +31,7 @@ router.get('/image', async (req, res) => {
         const placesResponse = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
           params: {
             query: searchQuery,
-            key: process.env.GOOGLE_PLACES_API_KEY,
+            key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
             type: 'campground'
           }
         });
@@ -50,7 +50,7 @@ router.get('/image', async (req, res) => {
               params: {
                 maxwidth: 400,
                 photoreference: photoReference,
-                key: process.env.GOOGLE_PLACES_API_KEY
+                key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY
               },
               responseType: 'text'
             });
