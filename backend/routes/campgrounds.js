@@ -2,17 +2,13 @@ const router = require('express').Router();
 const Campground = require('../models/campground_model');
 const axios = require('axios');
 require('dotenv').config();
-
+const ImageCache = require('../../frontend/src/util/imageCache');
 router.get('/image', async (req, res) => {
   try {
     const { query } = req.query;
 
     if (!query) {
       return res.status(400).json({ message: 'Query parameter is required' });
-    }
-
-    if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY) {
-      return res.status(500).json({ message: 'Google Places API key is not configured' });
     }
 
     // Generate multiple search variations

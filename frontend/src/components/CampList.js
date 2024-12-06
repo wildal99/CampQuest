@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
-
+import ImageCache from '../util/imageCache';
 const saveState = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
@@ -128,19 +128,28 @@ const CampList = () => {
   }
 
   const fetchCampImage = async (campName, campState) => {
+    const cacheKey = `${campName},${campState}`;
+    
+    if (ImageCache.has(cacheKey)) {
+      return ImageCache.get(cacheKey);
+    }
+  
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps/image`, {
-        params: {
-          query: `${campName}, ${campState} campground`,
-        }
+        params: { query: `${campName}, ${campState} campground` }
       });
   
-      return response.data.imageUrl;
+      const imageUrl = response.data.imageUrl;
+      if (imageUrl) {
+        ImageCache.set(cacheKey, imageUrl); // Cache the fetched URL
+      }
+      return imageUrl;
     } catch (error) {
-      console.error('Error fetching camp image:', error.response ? error.response.data : error.message);
+      console.error('Error fetching camp image:', error);
       return null;
     }
   };
+  
   
   // In your fetchCamps method, update the image fetching logic
   const fetchCamps = async (page = 1) => {
