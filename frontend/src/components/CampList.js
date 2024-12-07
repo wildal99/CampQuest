@@ -182,45 +182,11 @@ const CampList = () => {
     } finally {
       setLoading(false);
     }
-  };const fetchCamps = async (page = 1) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps`, {
-        params: {
-          q: searchTerm,
-          amenities: selectedAmenities.join(','),
-          types: selectedTypes.join(','),
-          states: selectedStates.join(','),
-          page,
-          limit: campsPerPage
-        }
-      });
-  
-      const campgrounds = Array.isArray(response.data.campgrounds) ? response.data.campgrounds : [];
-      setCamp(campgrounds);
-      setTotalPages(response.data.totalPages || 1);
-      setCurrentPage(page);
-  
-      // Fetch images only if they are missing
-      const imagePromises = campgrounds.map(async (camp) => {
-        if (!camp.imageUrl) {
-          const imageUrl = await fetchCampImage(camp);
-          return { [camp._id]: imageUrl };
-        }
-        return { [camp._id]: camp.imageUrl };
-      });
-  
-      const imageResults = await Promise.all(imagePromises);
-      const imagesMap = imageResults.reduce((acc, curr) => ({ ...acc, ...curr }), {});
-      setCampImages(imagesMap);
-    } catch (error) {
-      console.error('Error fetching campgrounds:', error);
-      setCamp([]);
-    } finally {
-      setLoading(false);
-    }
   };
   
+  
+
+
   useEffect(() => {
     setSearchTerm(loadState('searchTerm', ""));
     setSelectedAmenities(loadState('selectedAmenities', []));
