@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../App.css';
-import ImageCache from '../util/imageCache';
+
 const saveState = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };

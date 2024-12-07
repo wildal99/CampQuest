@@ -2,7 +2,7 @@ const router = require('express').Router();
 const Campground = require('../models/campground_model');
 const axios = require('axios');
 require('dotenv').config();
-const ImageCache = require('../../frontend/src/util/imageCache');
+
 router.get('/image', async (req, res) => {
   try {
     const { query } = req.query;
