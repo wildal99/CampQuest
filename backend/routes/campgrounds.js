@@ -11,7 +11,18 @@ router.get('/image', async (req, res) => {
       return res.status(400).json({ message: 'Query parameter is required' });
     }
 
-    // Generate multiple search variations
+    // Search for the campground in the database
+    const existingCamp = await Campground.findOne({ campgroundName: new RegExp(query.split(',')[0], 'i') });
+
+    if (existingCamp && existingCamp.imageUrl) {
+      return res.json({ imageUrl: existingCamp.imageUrl });
+    }
+
+    // Fetch from Google Maps if not in database
+    if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY) {
+      return res.status(500).json({ message: 'Google Places API key is not configured' });
+    }
+
     const searchQueries = [
       query,
       query.replace('campground', '').trim(),
@@ -23,7 +34,6 @@ router.get('/image', async (req, res) => {
 
     for (const searchQuery of searchQueries) {
       try {
-        // Search for places
         const placesResponse = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
           params: {
             query: searchQuery,
@@ -33,11 +43,9 @@ router.get('/image', async (req, res) => {
         });
 
         const results = placesResponse.data.results;
-        
-        // If no results, continue to next query
+
         if (!results || results.length === 0) continue;
 
-        // Try to find an image in the results
         for (const result of results) {
           const photoReference = result.photos?.[0]?.photo_reference;
 
@@ -51,10 +59,13 @@ router.get('/image', async (req, res) => {
               responseType: 'text'
             });
 
-            return res.json({
-              imageUrl: imageResponse.request.res.responseUrl,
-              placeName: result.name
-            });
+            const imageUrl = imageResponse.request.res.responseUrl;
+
+            // Save the image URL to the database
+            existingCamp.imageUrl = imageUrl;
+            await existingCamp.save();
+
+            return res.json({ imageUrl });
           }
         }
       } catch (searchError) {
@@ -62,18 +73,10 @@ router.get('/image', async (req, res) => {
       }
     }
 
-    // If no image found after all queries
-    return res.json({
-      imageUrl: null,
-      placeName: null
-    });
-
+    return res.json({ imageUrl: null });
   } catch (error) {
-    console.error('Comprehensive image fetch error:', error);
-    res.status(500).json({ 
-      message: 'Unexpected error in image retrieval',
-      error: error.message 
-    });
+    console.error('Error fetching image:', error);
+    res.status(500).json({ message: 'Unexpected error in image retrieval', error: error.message });
   }
 });
 

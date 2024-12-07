@@ -127,23 +127,17 @@ const CampList = () => {
     }
   }
 
-  const fetchCampImage = async (campName, campState) => {
-    const cacheKey = `${campName},${campState}`;
-    
-    if (ImageCache.has(cacheKey)) {
-      return ImageCache.get(cacheKey);
+  const fetchCampImage = async (camp) => {
+    if (camp.imageUrl) {
+      return camp.imageUrl; // Use existing URL if available
     }
   
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/camps/image`, {
-        params: { query: `${campName}, ${campState} campground` }
+        params: { query: `${camp.campgroundName}, ${camp.state} campground` },
       });
   
-      const imageUrl = response.data.imageUrl;
-      if (imageUrl) {
-        ImageCache.set(cacheKey, imageUrl); // Cache the fetched URL
-      }
-      return imageUrl;
+      return response.data.imageUrl || null;
     } catch (error) {
       console.error('Error fetching camp image:', error);
       return null;
@@ -171,10 +165,13 @@ const CampList = () => {
       setTotalPages(response.data.totalPages || 1);
       setCurrentPage(page);
   
-      // Fetch images for each campground
+      // Fetch images only if they are missing
       const imagePromises = campgrounds.map(async (camp) => {
-        const imageUrl = await fetchCampImage(camp.campgroundName, camp.state);
-        return { [camp._id]: imageUrl };
+        if (!camp.imageUrl) {
+          const imageUrl = await fetchCampImage(camp);
+          return { [camp._id]: imageUrl };
+        }
+        return { [camp._id]: camp.imageUrl };
       });
   
       const imageResults = await Promise.all(imagePromises);
@@ -187,6 +184,7 @@ const CampList = () => {
       setLoading(false);
     }
   };
+  
 
 
   useEffect(() => {
