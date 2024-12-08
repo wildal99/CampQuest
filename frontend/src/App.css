@@ -185,12 +185,13 @@ input.searchText{
   border: 1px solid #ccc;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 10;
-  width: 200px;
+  width: 250px;
   max-height: 300px;
   overflow-y: auto;
   margin-top: 4px;
   border-radius: 4px;
 }
+
 
 .dropdown-item {
   display: flex;
