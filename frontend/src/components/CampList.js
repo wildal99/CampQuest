@@ -168,7 +168,8 @@ const CampList = () => {
     saveState('selectedAmenities', selectedAmenities);
     saveState('selectedTypes', selectedTypes);
     saveState('currentPage', currentPage);
-  }, [searchTerm, selectedAmenities, selectedTypes, currentPage]);
+    saveState('selectedStates', selectedStates);
+  }, [searchTerm, selectedAmenities, selectedTypes, selectedStates, currentPage]);
 
   const handleFilterChange = (value, setter) => {
     setter(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]);
@@ -199,8 +200,7 @@ const CampList = () => {
                     type="checkbox"
                     id={id} 
                     value={option.code}
-                    checked={selected.includes(option.code)}
-                   
+                    defaultChecked={selected.includes(option.code)}
                   />
                   <label htmlFor={id}>{option.label}</label> 
                 </div>
@@ -250,11 +250,12 @@ const CampList = () => {
             setSearchTerm("");
             setSelectedAmenities([]);
             setSelectedTypes([]);
+            setSelectedStates([]);
             setCurrentPage(1);
             saveState('searchTerm', "");
             saveState('selectedAmenities', []);
             saveState('selectedTypes', []);
-            fetchCamps(1);
+            saveState('selectedStates', []);
           }}
         >
           Clear Filters
