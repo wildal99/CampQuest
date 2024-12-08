@@ -191,17 +191,21 @@ const CampList = () => {
         </button>
         {open && (
           <div className="dropdown-menu" onBlur={() => setOpen(false)} tabIndex={0}>
-            {options.map(option => (
-              <label key={option.code} className="dropdown-item">
-                <input
-                  type="checkbox"
-                  value={option.code}
-                  checked={selected.includes(option.code)}
-                  onChange={() => handleFilterChange(option.code, setSelected)}
-                />
-                {option.label}
-              </label>
-            ))}
+            {options.map(option => {
+              const id = `checkbox-${option.code}`; 
+              return (
+                <div key={option.code} className="dropdown-item" onClick={() => handleFilterChange(option.code, setSelected)} >
+                  <input
+                    type="checkbox"
+                    id={id} 
+                    value={option.code}
+                    checked={selected.includes(option.code)}
+                   
+                  />
+                  <label htmlFor={id}>{option.label}</label> 
+                </div>
+              );
+  })}
           </div>
         )}
       </div>
