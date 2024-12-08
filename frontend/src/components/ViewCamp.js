@@ -147,12 +147,12 @@ const CampView = () => {
       }
     : { lat: 0, lng: 0 };
 
-
+      //Function to handle back button navigation
       const navigate = useNavigate();
       const handleBackClick = () => {
         navigate(-1);
       };
-
+      //Function to hide 'N/A' fields from campground details
       const hideField = (label, value) => {
         return value && value !== 'N/A' ? (
           <p><strong>{label}</strong> {value}</p>
