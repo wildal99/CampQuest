@@ -215,7 +215,7 @@ const CampList = () => {
   return (
     <div className="camp-list">
       <form onSubmit={handleSearchFormSubmit}>
-        <input
+        <input 
           className="searchText"
           type="text"
           name="search"
