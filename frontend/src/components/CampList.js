@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import DropdownCheckbox from './DropdownCheckbox/DropdownCheckbox';
 import '../App.css';
 
 const saveState = (key, value) => {
@@ -191,45 +192,11 @@ const CampList = () => {
     saveState('selectedStates', selectedStates);
   }, [searchTerm, selectedAmenities, selectedTypes, selectedStates, currentPage]);
 
-  const handleFilterChange = (value, setter) => {
-    setter(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]);
-  };
-
   const changePage = (direction) => {
     const newPage = currentPage + direction;
     if (newPage > 0 && newPage <= totalPages) {
       fetchCamps(newPage);
     }
-  };
-
-  const DropdownCheckbox = ({ label, options, selected, setSelected }) => {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <div className="dropdown-checkbox">
-        <button className="dropdown-button" onClick={() => setOpen(!open)}>
-          {label} {selected.length > 0 && `(${selected.length})`}
-        </button>
-        {open && (
-          <div className="dropdown-menu" onBlur={() => setOpen(false)} tabIndex={0}>
-            {options.map(option => {
-              const id = `checkbox-${option.code}`; 
-              return (
-                <div key={option.code} className="dropdown-item" onClick={() => handleFilterChange(option.code, setSelected)} >
-                  <input
-                    type="checkbox"
-                    id={id} 
-                    value={option.code}
-                    defaultChecked={selected.includes(option.code)}
-                  />
-                  <label htmlFor={id}>{option.label}</label> 
-                </div>
-              );
-  })}
-          </div>
-        )}
-      </div>
-    );
   };
 
   return (
