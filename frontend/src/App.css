@@ -171,6 +171,7 @@ input.searchText{
   position: relative;
   display: inline-block;
   margin-right: 10px;
+  margin-bottom: 10px;
 }
 
 .dropdown-button {
@@ -179,6 +180,10 @@ input.searchText{
   padding: 8px 12px;
   cursor: pointer;
   border-radius: 4px;
+}
+
+.clear-filters {
+  margin-bottom: 10px;
 }
 
 .dropdown-menu {
