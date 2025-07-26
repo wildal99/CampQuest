@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, Marker} from '@react-google-maps/api';
 import { useParams, Link } from 'react-router-dom';
 import '../ViewCamp.css';
 import { useNavigate } from 'react-router-dom'
 import ReviewList from './reviews/ReviewList';
+
 const CampView = () => {
   const { id } = useParams();
   const [camp, setCamp] = useState(null);
   const [similarCamps, setSimilarCamps] = useState([]);
-
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+  });
   const amenitiesMap = {
     E: 'Electric',
     WE: 'Water & Electric',
@@ -160,12 +163,25 @@ const CampView = () => {
     }
   }, [camp, id]);
 
-  const center = camp
+
+  const hasValidCoordinates = (camp) => {
+    return camp &&
+      camp.latitude !== undefined &&
+      camp.longitude !== undefined &&
+      !isNaN(camp.latitude) &&
+      !isNaN(camp.longitude) &&
+      Number(camp.latitude) !== 0 &&
+      Number(camp.longitude) !== 0;
+  };
+
+  const center = hasValidCoordinates(camp)
     ? {
       lat: parseFloat(camp.latitude),
       lng: parseFloat(camp.longitude),
     }
-    : { lat: 0, lng: 0 };
+    :null;
+
+   console.log("center", center);
 
       //Function to handle back button navigation
       const navigate = useNavigate();
@@ -180,18 +196,27 @@ const CampView = () => {
       };
     
   return (
-    <div className="view-camp-container">
-      {camp ? (
-        <>
-          {/* Map and Camp Details */}
-          <div className="map-camp-section">
-            <div className="map-container">
-              <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
-                <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={10}>
-                  <Marker position={center} />
-                </GoogleMap>
-              </LoadScript>
-            </div>
+      <div className="view-camp-container">
+        {camp ? (
+          <>
+            <div className="map-camp-section">
+              <div className="map-container">
+                {loadError && <p>Error loading Google Maps</p>}
+                {!isLoaded || !center? (
+                  <p>Loading map...</p>
+                ) : (
+                  <GoogleMap
+                    mapContainerStyle={mapContainerStyle}
+                    center={center}
+                    zoom={10}
+                  >
+                    <Marker
+                      key="marker"
+                      position={center}
+                    />
+                  </GoogleMap>
+                ) }
+              </div>
       
             <div className="camp-details">
               <h1>{camp.campgroundName}</h1>
